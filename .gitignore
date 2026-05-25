@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Next.js build
+.next/
+**/.next/
+
+# Environment files
+.env
+.env.local
+.env.development
+.env.production
+.env*.local
+**/.env
+**/.env.local
+**/.env.development
+**/.env.production
+**/.env*.local
+
+# Supabase temp files
+supabase/.temp/
+**/supabase/.temp/
+
+# Misc
+.DS_Store
+*.pem
+.vercel
+**/.vercel
+*.tsbuildinfo

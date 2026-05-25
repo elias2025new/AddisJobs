@@ -1,0 +1,132 @@
+/**
+ * api.ts — Secure API layer for Prime Hospitality
+ *
+ * ALL mutating requests (application submission, profile creation, job posting)
+ * MUST go through this module. It automatically attaches the raw Telegram
+ * initData as the `x-telegram-init-data` header, which the Edge Function
+ * validates via HMAC-SHA256 before processing any action.
+ *
+ * Never call Supabase client-side for writes — always use these functions.
+ */
+
+const EDGE_FUNCTION_URL = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/validate-telegram-auth`;
+
+// ---------------------------------------------------------------------------
+// Internal request helper
+// ---------------------------------------------------------------------------
+async function callEdgeFunction<T = unknown>(
+  initData: string | null,
+  body: Record<string, unknown>
+): Promise<T> {
+  if (!initData) {
+    // In development (outside Telegram) there is no real initData.
+    // We still make the call but the Edge Function will reject non-dev requests.
+    console.warn(
+      "[api] No initData available. This request will fail in production."
+    );
+  }
+
+  const res = await fetch(EDGE_FUNCTION_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      // This header is the security gate. The Edge Function will reject any
+      // request where this value fails HMAC-SHA256 validation.
+      "x-telegram-init-data": initData ?? "",
+    },
+    body: JSON.stringify(body),
+  });
+
+  let data: unknown;
+  try {
+    data = await res.json();
+  } catch {
+    throw new Error("Server returned an invalid response.");
+  }
+
+  if (!res.ok) {
+    const errData = data as { error?: string };
+    throw new ApiError(
+      errData?.error ?? "An unknown error occurred.",
+      res.status
+    );
+  }
+
+  return data as T;
+}
+
+// ---------------------------------------------------------------------------
+// Custom error class for structured error handling in the UI
+// ---------------------------------------------------------------------------
+export class ApiError extends Error {
+  constructor(message: string, public readonly statusCode: number) {
+    super(message);
+    this.name = "ApiError";
+  }
+
+  /** Returns true if the error is a rate-limit response (429) */
+  get isRateLimit() {
+    return this.statusCode === 429;
+  }
+
+  /** Returns true if the auth signature was rejected (401) */
+  get isUnauthorized() {
+    return this.statusCode === 401;
+  }
+
+  /** Returns true if this was a duplicate submission (409) */
+  get isDuplicate() {
+    return this.statusCode === 409;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Action: Submit a job application
+// ---------------------------------------------------------------------------
+export interface SubmitApplicationParams {
+  initData: string | null;
+  jobId: string;
+  coverNote?: string;
+}
+
+export async function submitApplication({
+  initData,
+  jobId,
+  coverNote,
+}: SubmitApplicationParams): Promise<{ success: boolean; message: string }> {
+  return callEdgeFunction(initData, {
+    action: "submit_application",
+    jobId,
+    coverNote: coverNote ?? "",
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Action: Create job seeker profile (onboarding completion)
+// ---------------------------------------------------------------------------
+export interface CreateProfileParams {
+  initData: string | null;
+  profileData: {
+    fullName: string;
+    age: number | "";
+    location: string;
+    willingToRelocate: boolean;
+    contactShared: boolean | null;
+    phoneNumber: string;
+    selectedCategories: string[];
+    experienceLevels: Record<string, string>;
+  };
+  cvUrl: string | null;
+}
+
+export async function createProfile({
+  initData,
+  profileData,
+  cvUrl,
+}: CreateProfileParams): Promise<{ success: boolean; message: string }> {
+  return callEdgeFunction(initData, {
+    action: "create_profile",
+    profileData,
+    cvUrl,
+  });
+}
