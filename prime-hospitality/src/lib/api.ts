@@ -31,8 +31,11 @@ async function callEdgeFunction<T = unknown>(
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      // This header is the security gate. The Edge Function will reject any
-      // request where this value fails HMAC-SHA256 validation.
+      // Supabase Edge Functions require the anon key in the Authorization header
+      // to pass through the API gateway, even though our custom logic validates
+      // the x-telegram-init-data header.
+      Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ""}`,
+      // This header is the security gate for our custom Telegram validation
       "x-telegram-init-data": initData ?? "",
     },
     body: JSON.stringify(body),
