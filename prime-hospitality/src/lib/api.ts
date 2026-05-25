@@ -46,11 +46,12 @@ async function callEdgeFunction<T = unknown>(
   }
 
   if (!res.ok) {
-    const errData = data as { error?: string };
-    throw new ApiError(
-      errData?.error ?? "An unknown error occurred.",
-      res.status
-    );
+    const errData = data as { error?: string; message?: string };
+    const errorMsg =
+      errData?.error ||
+      errData?.message ||
+      `Unknown error (${res.status}): ${JSON.stringify(data).substring(0, 100)}`;
+    throw new ApiError(errorMsg, res.status);
   }
 
   return data as T;
