@@ -59,32 +59,40 @@ export function useOnboarding() {
       let cvUrl: string | null = null;
       const telegramId = user?.id || Date.now(); // fallback for dev
 
-      // 1. Upload CV to Supabase Storage if present
-      //    (Storage upload is OK client-side; it doesn't bypass row-level DB RLS)
+      // 1. Upload CV to Supabase Storage (NON-FATAL — skip if bucket missing or error)
       if (state.cvFile && state.cvUploaded) {
-        const fileExt = state.cvFile.name.split(".").pop();
-        const fileName = `${telegramId}-${Date.now()}.${fileExt}`;
-        const filePath = `cvs/${fileName}`;
+        try {
+          const fileExt = state.cvFile.name.split(".").pop();
+          const fileName = `${telegramId}-${Date.now()}.${fileExt}`;
+          const filePath = `cvs/${fileName}`;
 
-        const { error: uploadError } = await supabase.storage
-          .from("resumes")
-          .upload(filePath, state.cvFile);
+          console.log("[CV Upload] Attempting upload to bucket 'resumes', path:", filePath);
 
-        if (uploadError) {
-          throw new Error(`CV Upload failed: ${uploadError.message}`);
+          const { error: uploadError } = await supabase.storage
+            .from("resumes")
+            .upload(filePath, state.cvFile);
+
+          if (uploadError) {
+            // Non-fatal: log and continue without CV
+            console.warn("[CV Upload] Upload failed (non-fatal, continuing without CV):", uploadError.message);
+            cvUrl = null;
+          } else {
+            const { data: publicUrlData } = supabase.storage
+              .from("resumes")
+              .getPublicUrl(filePath);
+            cvUrl = publicUrlData.publicUrl;
+            console.log("[CV Upload] Success! Public URL:", cvUrl);
+          }
+        } catch (cvErr) {
+          // Non-fatal: network error during upload — continue without CV
+          console.warn("[CV Upload] Network error (non-fatal, continuing without CV):", cvErr);
+          cvUrl = null;
         }
-
-        const { data: publicUrlData } = supabase.storage
-          .from("resumes")
-          .getPublicUrl(filePath);
-
-        cvUrl = publicUrlData.publicUrl;
       }
 
       // 2. Create profile via the secure Edge Function.
-      //    The Edge Function validates the Telegram initData signature before
-      //    inserting anything into the database.
-      await createProfile({
+      console.log("[Profile] Calling create_profile edge function. initData present:", !!initData);
+      const result = await createProfile({
         initData,
         profileData: {
           fullName: state.fullName,
@@ -99,18 +107,20 @@ export function useOnboarding() {
         cvUrl,
       });
 
+      console.log("[Profile] Edge function result:", result);
       // Success — advance to the success screen
       setStep(6);
     } catch (error: unknown) {
-      console.error("Onboarding submission error:", error);
+      console.error("[Onboarding] Submission error:", error);
       let message = "Failed to submit profile. Please try again.";
       if (error instanceof ApiError) {
+        console.error("[Onboarding] ApiError — status:", error.statusCode, "message:", error.message);
         if (error.isDuplicate) {
           // Profile already exists — treat as success and move on
           setStep(6);
           return;
         }
-        message = error.message;
+        message = error.message || `Server error (${error.statusCode})`;
       } else if (error instanceof Error) {
         message = error.message;
       }
