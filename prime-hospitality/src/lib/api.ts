@@ -9,7 +9,8 @@
  * Never call Supabase client-side for writes — always use these functions.
  */
 
-const EDGE_FUNCTION_URL = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/validate-telegram-auth`;
+const EDGE_FUNCTION_URL = `${process.env.NEXT_PUBLIC_SUPABASE_URL || "https://placeholder-project.supabase.co"}/functions/v1/validate-telegram-auth`;
+
 
 // ---------------------------------------------------------------------------
 // Internal request helper
