@@ -39,7 +39,9 @@ export default function App() {
   useEffect(() => {
     async function checkOnboarding() {
       if (!isTelegramReady) return;
+      console.log("[Prime Hospitality] Launching onboarding check for Telegram user:", user?.id || "Dev Mode");
       if (!user) {
+
         // Not in Telegram, mock onboarding check
         setIsOnboarded(false);
         return;
