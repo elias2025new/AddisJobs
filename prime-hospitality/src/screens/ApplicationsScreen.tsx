@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence, LazyMotion, domAnimation } from "framer-motion";
 import { FileText, MapPin, Clock, ChevronRight, RefreshCw } from "lucide-react";
-import { supabase } from "@/lib/supabase";
+import { fetchApplications } from "@/lib/api";
 import { useTelegram } from "@/hooks/useTelegram";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -65,51 +65,36 @@ function timeAgo(dateStr: string): string {
 
 // ─── Main Screen ─────────────────────────────────────────────────────────────
 export default function ApplicationsScreen() {
-  const { user } = useTelegram();
+  const { initData } = useTelegram();
   const [applications, setApplications] = useState<Application[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchApplications = useCallback(async () => {
-    if (!user) return;
+  const loadApplications = useCallback(async () => {
+    // No real Telegram session (browser dev mode)
+    if (!initData) {
+      setApplications([]);
+      setIsLoading(false);
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
 
     try {
-      const { data, error: fetchError } = await supabase
-        .from("applications")
-        .select(`
-          id,
-          job_id,
-          status,
-          cover_note,
-          created_at,
-          jobs (
-            title,
-            location,
-            neighborhood,
-            employers (
-              business_name,
-              business_type
-            )
-          )
-        `)
-        .eq("telegram_id", user.id)
-        .order("created_at", { ascending: false });
-
-      if (fetchError) throw fetchError;
-      setApplications((data ?? []) as unknown as Application[]);
+      const result = await fetchApplications(initData);
+      setApplications(result.applications as unknown as Application[]);
     } catch (err) {
       console.error("Failed to fetch applications:", err);
       setError("Could not load your applications. Please try again.");
     } finally {
       setIsLoading(false);
     }
-  }, [user]);
+  }, [initData]);
 
   useEffect(() => {
-    fetchApplications();
-  }, [fetchApplications]);
+    loadApplications();
+  }, [loadApplications]);
 
   return (
     <LazyMotion features={domAnimation}>
@@ -138,7 +123,7 @@ export default function ApplicationsScreen() {
             </div>
             <motion.button
               whileTap={{ scale: 0.9 }}
-              onClick={fetchApplications}
+              onClick={loadApplications}
               style={{
                 width: 38, height: 38, borderRadius: 12,
                 background: "rgba(255,255,255,0.05)",
@@ -179,7 +164,7 @@ export default function ApplicationsScreen() {
             >
               <p style={{ color: "#FCA5A5", fontSize: 14, marginBottom: 12 }}>{error}</p>
               <button
-                onClick={fetchApplications}
+                onClick={loadApplications}
                 style={{
                   fontSize: 13, fontWeight: 600, color: "var(--gold)",
                   background: "none", border: "none", cursor: "pointer",

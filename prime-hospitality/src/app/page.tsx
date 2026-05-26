@@ -5,6 +5,7 @@ import { AnimatePresence, LazyMotion, domAnimation } from "framer-motion";
 import { Job } from "@/data/jobs";
 import { JobSeekerProfile } from "@/data/profile";
 import { useTelegram } from "@/hooks/useTelegram";
+import { fetchProfile } from "@/lib/api";
 
 import BottomNav, { NavTab } from "@/components/BottomNav";
 import HomeScreen from "@/screens/HomeScreen";
@@ -15,7 +16,6 @@ import ConfirmationScreen from "@/screens/ConfirmationScreen";
 import OnboardingScreen from "@/screens/OnboardingScreen";
 import ApplicationsScreen from "@/screens/ApplicationsScreen";
 import ProfileScreen from "@/screens/ProfileScreen";
-import { supabase } from "@/lib/supabase";
 import SearchScreen from "@/screens/SearchScreen";
 import DashboardScreen from "@/screens/DashboardScreen";
 
@@ -28,37 +28,28 @@ type AppView =
   | { screen: "confirmation"; job: Job };
 
 export default function App() {
-  const { user, isEmployer, isReady: isTelegramReady } = useTelegram();
+  const { user, isEmployer, isReady: isTelegramReady, initData } = useTelegram();
   const [activeTab, setActiveTab] = useState<NavTab>("home");
   const [view, setView] = useState<AppView>({ screen: "home" });
   
   // Onboarding state
   const [isOnboarded, setIsOnboarded] = useState<boolean | null>(null);
 
-  // Check onboarding status via Supabase
+  // Check onboarding status via Edge Function (uses service-role key, bypasses RLS)
   useEffect(() => {
     async function checkOnboarding() {
       if (!isTelegramReady) return;
       console.log("[Prime Hospitality] Launching onboarding check for Telegram user:", user?.id || "Dev Mode");
-      if (!user) {
 
-        // Not in Telegram, mock onboarding check
+      // No real Telegram session (browser dev mode) — always show onboarding
+      if (!initData) {
         setIsOnboarded(false);
         return;
       }
 
       try {
-        const { data, error } = await supabase
-          .from("profiles")
-          .select("onboarding_completed")
-          .eq("telegram_id", user.id)
-          .single();
-
-        if (error || !data) {
-          setIsOnboarded(false); // No profile found, needs onboarding
-        } else {
-          setIsOnboarded(data.onboarding_completed);
-        }
+        const result = await fetchProfile(initData);
+        setIsOnboarded(result.onboarding_completed);
       } catch (err) {
         console.error("Error checking onboarding status:", err);
         setIsOnboarded(false);
@@ -66,7 +57,7 @@ export default function App() {
     }
 
     checkOnboarding();
-  }, [isTelegramReady, user]);
+  }, [isTelegramReady, initData]);
 
   // ── Navigation handlers ──
 

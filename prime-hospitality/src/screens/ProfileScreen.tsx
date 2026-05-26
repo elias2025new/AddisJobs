@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, LazyMotion, domAnimation } from "framer-motion";
 import { User, Phone, MapPin, Briefcase, FileText, RefreshCw, CheckCircle, HelpCircle } from "lucide-react";
-import { supabase } from "@/lib/supabase";
+import { fetchProfile as fetchProfileApi } from "@/lib/api";
 import { useTelegram } from "@/hooks/useTelegram";
 
 interface Profile {
@@ -22,32 +22,36 @@ interface Profile {
 }
 
 export default function ProfileScreen() {
-  const { user } = useTelegram();
+  const { user, initData } = useTelegram();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchProfile = useCallback(async () => {
-    if (!user) return;
     setIsLoading(true);
     setError(null);
 
-    try {
-      const { data, error: fetchError } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("telegram_id", user.id)
-        .single();
+    // No real Telegram session — can't securely fetch profile
+    if (!initData) {
+      setError("Open the app inside Telegram to view your profile.");
+      setIsLoading(false);
+      return;
+    }
 
-      if (fetchError) throw fetchError;
-      setProfile(data as Profile);
+    try {
+      const result = await fetchProfileApi(initData);
+      if (!result.profile) {
+        setError("Profile not found. Please complete registration.");
+      } else {
+        setProfile(result.profile as unknown as Profile);
+      }
     } catch (err) {
       console.error("Failed to fetch profile:", err);
       setError("Could not load your profile. Please try again.");
     } finally {
       setIsLoading(false);
     }
-  }, [user]);
+  }, [initData]);
 
   useEffect(() => {
     fetchProfile();

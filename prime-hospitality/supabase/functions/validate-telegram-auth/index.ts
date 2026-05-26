@@ -280,6 +280,237 @@ serve(async (req: Request) => {
       });
     }
 
+    // Action: Get Profile
+    if (action === "get_profile") {
+      const { data: profileData, error: profileError } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("telegram_id", telegramId)
+        .single();
+
+      // PGRST116 = "no rows" — user hasn't completed onboarding yet
+      if (profileError && profileError.code !== "PGRST116") {
+        throw profileError;
+      }
+
+      return new Response(
+        JSON.stringify({
+          success: true,
+          profile: profileData ?? null,
+          onboarding_completed: profileData?.onboarding_completed ?? false,
+        }),
+        {
+          status: 200,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    // Action: Get Applications
+    if (action === "get_applications") {
+      const { data: appData, error: appError } = await supabase
+        .from("applications")
+        .select(`
+          id,
+          job_id,
+          status,
+          cover_note,
+          created_at,
+          jobs (
+            title,
+            location,
+            neighborhood,
+            employers (
+              business_name,
+              business_type
+            )
+          )
+        `)
+        .eq("telegram_id", telegramId)
+        .order("created_at", { ascending: false });
+
+      if (appError) throw appError;
+
+      return new Response(
+        JSON.stringify({
+          success: true,
+          applications: appData ?? [],
+        }),
+        {
+          status: 200,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    // Action: Get Employer Dashboard
+    if (action === "get_employer_dashboard") {
+      // 1) Find the user
+      const { data: userRow, error: userErr } = await supabase
+        .from("users")
+        .select("id")
+        .eq("telegram_id", telegramId)
+        .single();
+
+      if (userErr || !userRow) {
+        return new Response(JSON.stringify({ error: "Employer user not found." }), {
+          status: 404,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      // 2) Find the employer record
+      const { data: employer, error: empErr } = await supabase
+        .from("employers")
+        .select("id, business_name, status")
+        .eq("user_id", userRow.id)
+        .single();
+
+      if (empErr || !employer) {
+        return new Response(JSON.stringify({ error: "Employer profile not found." }), {
+          status: 404,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      // 3) Fetch jobs for this employer
+      const { data: jobsData, error: jobsErr } = await supabase
+        .from("jobs")
+        .select("id, title, category, neighborhood, status, created_at, deadline")
+        .eq("employer_id", employer.id)
+        .order("created_at", { ascending: false });
+
+      if (jobsErr) throw jobsErr;
+
+      // 4) For each job, count applications
+      const jobsWithCounts = await Promise.all(
+        (jobsData ?? []).map(async (job) => {
+          const { count } = await supabase
+            .from("applications")
+            .select("id", { count: "exact", head: true })
+            .eq("job_id", job.id);
+          return { ...job, application_count: count ?? 0 };
+        })
+      );
+
+      // 5) Compute stats
+      const active = jobsWithCounts.filter((j: any) => j.status === "active").length;
+      const totalApplicants = jobsWithCounts.reduce((acc: number, j: any) => acc + j.application_count, 0);
+      const pendingReview = jobsWithCounts.filter((j: any) => j.status === "pending").length;
+
+      return new Response(
+        JSON.stringify({
+          success: true,
+          employer: {
+            id: employer.id,
+            business_name: employer.business_name,
+            status: employer.status,
+          },
+          jobs: jobsWithCounts,
+          stats: {
+            totalJobs: jobsWithCounts.length,
+            activeJobs: active,
+            totalApplicants,
+            pendingReview,
+          },
+        }),
+        {
+          status: 200,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    // Action: Post Job
+    if (action === "post_job") {
+      const { jobData } = payload;
+      if (!jobData) {
+        return new Response(JSON.stringify({ error: "jobData is required" }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const { title, category, jobType, salaryMin, salaryMax, neighborhood, description, deadline, experience } = jobData;
+
+      if (!title?.trim() || !description?.trim() || !deadline) {
+        return new Response(JSON.stringify({ error: "Please fill in all required fields." }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      // 1) Find the user & employer ID
+      const { data: userRow, error: userErr } = await supabase
+        .from("users")
+        .select("id")
+        .eq("telegram_id", telegramId)
+        .single();
+
+      if (userErr || !userRow) {
+        return new Response(JSON.stringify({ error: "Employer user not found." }), {
+          status: 404,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      const { data: employer, error: empErr } = await supabase
+        .from("employers")
+        .select("id, status")
+        .eq("user_id", userRow.id)
+        .single();
+
+      if (empErr || !employer) {
+        return new Response(JSON.stringify({ error: "Employer profile not found." }), {
+          status: 404,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      if (employer.status !== "approved") {
+        return new Response(JSON.stringify({ error: "Employer account not approved to post jobs." }), {
+          status: 403,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      // 2) Insert the job listing
+      const { error: insertErr } = await supabase.from("jobs").insert({
+        employer_id: employer.id,
+        title: sanitizeHtml(title.trim()),
+        category,
+        job_type: jobType,
+        salary_min: parseInt(salaryMin) || 0,
+        salary_max: parseInt(salaryMax) || 0,
+        currency: "ETB",
+        neighborhood,
+        location: `${neighborhood}, Addis Ababa`,
+        description: sanitizeHtml(description.trim()),
+        full_description: sanitizeHtml(description.trim()),
+        status: "pending",
+        deadline,
+        requirements: {
+          experience,
+          education: "",
+          languages: ["Amharic"],
+          locationPreference: null,
+        },
+      });
+
+      if (insertErr) throw insertErr;
+
+      return new Response(
+        JSON.stringify({
+          success: true,
+          message: "Job posted successfully.",
+        }),
+        {
+          status: 200,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
+
     // Add other actions (post_job, etc.) as needed...
 
     return new Response(JSON.stringify({ error: "Unknown action" }), {

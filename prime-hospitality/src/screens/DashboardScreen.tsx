@@ -3,8 +3,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence, LazyMotion, domAnimation } from "framer-motion";
 import { Briefcase, Users, Clock, CheckCircle, AlertCircle, RefreshCw, PlusCircle, TrendingUp, X, ChevronDown } from "lucide-react";
-import { supabase } from "@/lib/supabase";
 import { useTelegram } from "@/hooks/useTelegram";
+import { fetchEmployerDashboard, postJob } from "@/lib/api";
 
 interface DashboardJob {
   id: string;
@@ -53,7 +53,7 @@ const POST_FORM_DEFAULT = {
 };
 
 export default function DashboardScreen() {
-  const { user } = useTelegram();
+  const { user, initData } = useTelegram();
   const [jobs, setJobs] = useState<DashboardJob[]>([]);
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -70,78 +70,31 @@ export default function DashboardScreen() {
   const [postSuccess, setPostSuccess] = useState(false);
 
   const fetchDashboard = useCallback(async () => {
-    if (!user) return;
+    // No real Telegram session (browser dev mode) — show error
+    if (!initData) {
+      setError("Open the app inside Telegram to view your employer dashboard.");
+      setIsLoading(false);
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
 
     try {
-      // 1) Look up the employer record by telegram_id
-      const { data: userRow, error: userErr } = await supabase
-        .from("users")
-        .select("id")
-        .eq("telegram_id", user.id)
-        .single();
-
-      if (userErr || !userRow) {
-        setError("Employer account not found. Please contact support.");
-        return;
-      }
-
-      const { data: employer, error: empErr } = await supabase
-        .from("employers")
-        .select("id, business_name, status")
-        .eq("user_id", userRow.id)
-        .single();
-
-      if (empErr || !employer) {
-        setError("No employer profile found. Please contact support.");
-        return;
-      }
-
-      setEmployerName(employer.business_name);
-      setIsApproved(employer.status === "approved");
-      setEmployerId(employer.id);
-
-      // 2) Fetch jobs for this employer
-      const { data: jobsData, error: jobsErr } = await supabase
-        .from("jobs")
-        .select("id, title, category, neighborhood, status, created_at, deadline")
-        .eq("employer_id", employer.id)
-        .order("created_at", { ascending: false });
-
-      if (jobsErr) throw jobsErr;
-
-      // 3) For each job, count applications
-      const jobsWithCounts: DashboardJob[] = await Promise.all(
-        (jobsData ?? []).map(async (job) => {
-          const { count } = await supabase
-            .from("applications")
-            .select("id", { count: "exact", head: true })
-            .eq("job_id", job.id);
-          return { ...job, application_count: count ?? 0 } as DashboardJob;
-        })
-      );
-
-      setJobs(jobsWithCounts);
-
-      // 4) Compute stats
-      const active = jobsWithCounts.filter((j) => j.status === "active").length;
-      const totalApplicants = jobsWithCounts.reduce((acc, j) => acc + j.application_count, 0);
-      const pendingReview = jobsWithCounts.filter((j) => j.status === "pending").length;
-
-      setStats({
-        totalJobs: jobsWithCounts.length,
-        activeJobs: active,
-        totalApplicants,
-        pendingReview,
-      });
+      const result = await fetchEmployerDashboard(initData);
+      
+      setEmployerName(result.employer.business_name);
+      setIsApproved(result.employer.status === "approved");
+      setEmployerId(result.employer.id);
+      setJobs(result.jobs as unknown as DashboardJob[]);
+      setStats(result.stats);
     } catch (err) {
       console.error("Dashboard fetch failed:", err);
       setError("Could not load your dashboard. Please try again.");
     } finally {
       setIsLoading(false);
     }
-  }, [user]);
+  }, [initData]);
 
   useEffect(() => {
     fetchDashboard();
@@ -161,28 +114,20 @@ export default function DashboardScreen() {
     setPostLoading(true);
     setPostError(null);
     try {
-      const { error: insertErr } = await supabase.from("jobs").insert({
-        employer_id: employerId,
-        title: title.trim(),
-        category: postForm.category,
-        job_type: postForm.jobType,
-        salary_min: parseInt(salaryMin) || 0,
-        salary_max: parseInt(salaryMax) || 0,
-        currency: "ETB",
-        neighborhood: postForm.neighborhood,
-        location: `${postForm.neighborhood}, Addis Ababa`,
-        description: description.trim(),
-        full_description: description.trim(),
-        status: "pending",
-        deadline,
-        requirements: {
+      await postJob({
+        initData,
+        jobData: {
+          title: title.trim(),
+          category: postForm.category,
+          jobType: postForm.jobType,
+          salaryMin,
+          salaryMax,
+          neighborhood: postForm.neighborhood,
+          description: description.trim(),
+          deadline,
           experience: postForm.experience,
-          education: "",
-          languages: ["Amharic"],
-          locationPreference: null,
         },
       });
-      if (insertErr) throw insertErr;
       setPostSuccess(true);
       setPostForm(POST_FORM_DEFAULT);
       setTimeout(() => {

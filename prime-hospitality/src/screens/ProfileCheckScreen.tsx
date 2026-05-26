@@ -36,11 +36,11 @@ const NEIGHBORHOODS = [
 ];
 
 import { useTelegram } from "@/hooks/useTelegram";
-import { supabase } from "@/lib/supabase";
+import { fetchProfile } from "@/lib/api";
 
 export default function ProfileCheckScreen({ job, onBack, onProceed }: ProfileCheckScreenProps) {
   const shouldReduceMotion = useReducedMotion();
-  const { user } = useTelegram();
+  const { user, initData } = useTelegram();
   const [profile, setProfile] = useState<JobSeekerProfile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [step, setStep] = useState<ProfileStep>("check");
@@ -62,8 +62,8 @@ export default function ProfileCheckScreen({ job, onBack, onProceed }: ProfileCh
 
   useEffect(() => {
     async function loadAndCheckProfile() {
-      if (!user) {
-        // Dev fallback
+      // No real Telegram session (browser dev mode) — fallback to mock
+      if (!initData) {
         const mock = MOCK_PROFILE;
         setProfile(mock);
         checkExperience(mock);
@@ -72,32 +72,30 @@ export default function ProfileCheckScreen({ job, onBack, onProceed }: ProfileCh
       }
 
       try {
-        const { data, error } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("telegram_id", user.id)
-          .single();
+        const result = await fetchProfile(initData);
 
-        if (error || !data) {
+        if (!result.profile) {
           setStep("build");
         } else {
           // Resolve experience level for this job category, or fallback to the first selected category's experience
-          const userExpMap = data.experience_levels || {};
+          const profileData = result.profile;
+          const userExpMap = (profileData.experience_levels || {}) as Record<string, string>;
           const jobCat = job.category;
-          const userExp = userExpMap[jobCat] || userExpMap[data.selected_categories?.[0]] || "Entry Level";
+          const selectedCategories = (profileData.selected_categories || []) as string[];
+          const userExp = userExpMap[jobCat] || userExpMap[selectedCategories[0]] || "Entry Level";
 
           const mappedProfile: JobSeekerProfile = {
-            id: data.id,
-            fullName: data.full_name,
-            phone: data.phone_number || "Not Shared",
-            telegramId: data.telegram_id,
+            id: profileData.id as string,
+            fullName: profileData.full_name as string,
+            phone: (profileData.phone_number as string) || "Not Shared",
+            telegramId: profileData.telegram_id as number,
             photoUrl: null,
-            preferredCategory: (data.selected_categories?.[0] as JobCategory) || "Waiter",
+            preferredCategory: (selectedCategories[0] as JobCategory) || "Waiter",
             experienceLevel: userExp as ExperienceLevel,
             education: "",
             languages: [],
-            neighborhood: data.location,
-            willingToRelocate: data.willing_to_relocate,
+            neighborhood: profileData.location as string,
+            willingToRelocate: profileData.willing_to_relocate as boolean,
             hasProfile: true,
           };
 

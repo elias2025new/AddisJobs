@@ -135,3 +135,91 @@ export async function createProfile({
     cvUrl,
   });
 }
+
+// ---------------------------------------------------------------------------
+// Action: Fetch job seeker profile (profile tab + onboarding check)
+// ---------------------------------------------------------------------------
+export interface FetchProfileResult {
+  success: boolean;
+  profile: Record<string, unknown> | null;
+  onboarding_completed: boolean;
+}
+
+export async function fetchProfile(
+  initData: string | null
+): Promise<FetchProfileResult> {
+  return callEdgeFunction<FetchProfileResult>(initData, {
+    action: "get_profile",
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Action: Fetch job seeker applications list
+// ---------------------------------------------------------------------------
+export interface FetchApplicationsResult {
+  success: boolean;
+  applications: Array<Record<string, any>>;
+}
+
+export async function fetchApplications(
+  initData: string | null
+): Promise<FetchApplicationsResult> {
+  return callEdgeFunction<FetchApplicationsResult>(initData, {
+    action: "get_applications",
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Action: Fetch employer dashboard data
+// ---------------------------------------------------------------------------
+export interface FetchEmployerDashboardResult {
+  success: boolean;
+  employer: {
+    id: string;
+    business_name: string;
+    status: "pending" | "approved" | "rejected";
+  };
+  jobs: Array<Record<string, any>>;
+  stats: {
+    totalJobs: number;
+    activeJobs: number;
+    totalApplicants: number;
+    pendingReview: number;
+  };
+}
+
+export async function fetchEmployerDashboard(
+  initData: string | null
+): Promise<FetchEmployerDashboardResult> {
+  return callEdgeFunction<FetchEmployerDashboardResult>(initData, {
+    action: "get_employer_dashboard",
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Action: Post a new job listing
+// ---------------------------------------------------------------------------
+export interface PostJobParams {
+  initData: string | null;
+  jobData: {
+    title: string;
+    category: string;
+    jobType: string;
+    salaryMin: string;
+    salaryMax: string;
+    neighborhood: string;
+    description: string;
+    deadline: string;
+    experience: string;
+  };
+}
+
+export async function postJob({
+  initData,
+  jobData,
+}: PostJobParams): Promise<{ success: boolean; message: string }> {
+  return callEdgeFunction(initData, {
+    action: "post_job",
+    jobData,
+  });
+}
