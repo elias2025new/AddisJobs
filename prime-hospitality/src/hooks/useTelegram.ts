@@ -37,6 +37,21 @@ export function useTelegram(): UseTelegramReturn {
         // Attempt to load Telegram WebApp data from window.Telegram
         const tgWebApp = (window as any).Telegram?.WebApp;
         if (typeof window !== "undefined" && tgWebApp?.initDataUnsafe?.user) {
+          // ── Full-screen: expand to fill the entire Telegram screen ──
+          // expand() works on all Telegram versions
+          tgWebApp.expand();
+          // requestFullscreen() is supported on Telegram 7.7+ (silently ignored on older)
+          tgWebApp.requestFullscreen?.();
+          // Disable vertical swipe-to-close so users don't accidentally dismiss the app
+          tgWebApp.disableVerticalSwipes?.();
+          // Enable closing confirmation to prevent accidental exits
+          tgWebApp.enableClosingConfirmation?.();
+          // Match ALL Telegram chrome colors to our navy so no bar is visible
+          tgWebApp.setHeaderColor?.('#0A0F1E');
+          tgWebApp.setBackgroundColor?.('#0A0F1E');
+          // Hide the bottom system bar (Telegram 8.0+, silently ignored on older)
+          tgWebApp.setBottomBarColor?.('#0A0F1E');
+
           const tgUser = tgWebApp.initDataUnsafe.user;
           setUser({
             id: tgUser.id,

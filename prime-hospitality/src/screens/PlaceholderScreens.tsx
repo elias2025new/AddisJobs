@@ -19,12 +19,15 @@ export function SearchScreen() {
 export function ApplicationsScreen() {
   return (
     <div
+      className="safe-screen-top"
       style={{
         display: "flex",
         flexDirection: "column",
         height: "100dvh",
         background: "var(--navy)",
-        padding: "52px 20px 96px",
+        paddingLeft: 20,
+        paddingRight: 20,
+        paddingBottom: 96,
         overflowY: "auto",
       }}
     >
@@ -79,12 +82,15 @@ export function ApplicationsScreen() {
 export function ProfileScreen() {
   return (
     <div
+      className="safe-screen-top"
       style={{
         display: "flex",
         flexDirection: "column",
         height: "100dvh",
         background: "var(--navy)",
-        padding: "52px 20px 96px",
+        paddingLeft: 20,
+        paddingRight: 20,
+        paddingBottom: 96,
         overflowY: "auto",
       }}
     >

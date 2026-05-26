@@ -75,12 +75,15 @@ export default function ApplicationScreen({ job, profile, onBack, onSubmit }: Ap
       >
         {/* ── HEADER ── */}
         <div
+          className="safe-screen-top"
           style={{
             position: "sticky", top: 0, zIndex: 10,
             background: "rgba(10,15,30,0.96)",
             backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)",
             borderBottom: "1px solid rgba(255,255,255,0.05)",
-            padding: "50px 20px 14px",
+            paddingLeft: 20,
+            paddingRight: 20,
+            paddingBottom: 14,
             display: "flex", alignItems: "center", gap: 12,
           }}
         >

@@ -56,7 +56,7 @@ export default function OnboardingScreen({ onComplete }: { onComplete: () => voi
         
         {/* Progress Bar (Hide on Step 6) */}
         {state.step < 6 && (
-          <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 4, background: "rgba(255,255,255,0.05)", zIndex: 50 }}>
+          <div style={{ position: "absolute", top: "env(safe-area-inset-top, 0px)", left: 0, right: 0, height: 4, background: "rgba(255,255,255,0.05)", zIndex: 50 }}>
             <motion.div
               initial={false}
               animate={{ width: `${(state.step / 5) * 100}%` }}
@@ -68,7 +68,7 @@ export default function OnboardingScreen({ onComplete }: { onComplete: () => voi
 
         {/* Back Button (Hide on Step 1 and 6) */}
         {state.step > 1 && state.step < 6 && (
-          <div style={{ position: "absolute", top: 20, left: 20, zIndex: 50 }}>
+          <div style={{ position: "absolute", top: "calc(env(safe-area-inset-top, 0px) + 20px)", left: 20, zIndex: 50 }}>
             <motion.button
               whileTap={{ scale: 0.9 }}
               onClick={() => goBack((state.step - 1) as OnboardingStep)}

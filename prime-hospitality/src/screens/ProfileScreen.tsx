@@ -85,7 +85,7 @@ export default function ProfileScreen() {
         }}
       >
         {/* Header */}
-        <div style={{ padding: "52px 20px 20px", flexShrink: 0 }}>
+        <div className="safe-screen-top" style={{ paddingLeft: 20, paddingRight: 20, paddingBottom: 20, flexShrink: 0 }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <div>
               <h1 style={{ fontSize: 22, fontWeight: 800, color: "var(--text-primary)", letterSpacing: "-0.02em", marginBottom: 4 }}>

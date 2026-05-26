@@ -45,6 +45,8 @@ html {
   overscroll-behavior: none;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Fullscreen Telegram: fill behind status bar */
+  padding-top: env(safe-area-inset-top, 0px);
 }
 
 body {
@@ -52,6 +54,13 @@ body {
   min-height: 100dvh;
   overflow-x: hidden;
   overscroll-behavior: none;
+}
+
+/* ── Telegram Fullscreen Safe-Area helpers ──
+   Use .safe-screen-top on screen header divs instead of hardcoded 52px
+   so the app looks perfect on every device (notch, dynamic island, etc.) */
+.safe-screen-top {
+  padding-top: max(52px, calc(env(safe-area-inset-top) + 12px)) !important;
 }
 
 /* Scrollbars */

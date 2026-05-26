@@ -156,7 +156,7 @@ export default function DashboardScreen() {
         }}
       >
         {/* ── Header ── */}
-        <div style={{ padding: "52px 20px 20px", flexShrink: 0 }}>
+        <div className="safe-screen-top" style={{ paddingLeft: 20, paddingRight: 20, paddingBottom: 20, flexShrink: 0 }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <div>
               <h1

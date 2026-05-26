@@ -109,8 +109,11 @@ export default function SearchScreen({ onJobSelect }: SearchScreenProps) {
       >
         {/* ── HEADER ── */}
         <div
+          className="safe-screen-top"
           style={{
-            padding: "52px 20px 12px",
+            paddingLeft: 20,
+            paddingRight: 20,
+            paddingBottom: 12,
             background: "linear-gradient(180deg, rgba(10,15,30,1) 0%, rgba(10,15,30,0.95) 100%)",
             flexShrink: 0,
           }}

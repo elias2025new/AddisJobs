@@ -32,8 +32,8 @@ export default function RootLayout({
           rel="stylesheet"
         />
         <meta name="telegram:web-app" content="true" />
-        {/* Load Telegram WebApp SDK */}
-        <script src="https://telegram.org/js/telegram-web-app.js" defer></script>
+        {/* Load Telegram WebApp SDK — must be synchronous so it's available on init */}
+        <script src="https://telegram.org/js/telegram-web-app.js"></script>
       </head>
       <body className="antialiased">{children}</body>
 

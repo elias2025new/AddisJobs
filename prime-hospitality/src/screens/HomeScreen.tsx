@@ -50,8 +50,11 @@ export default function HomeScreen({ onJobSelect, onSearchPress }: HomeScreenPro
           initial={shouldReduceMotion ? false : { opacity: 0, y: -12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
+          className="safe-screen-top"
           style={{
-            padding: "52px 20px 16px",
+            paddingLeft: 20,
+            paddingRight: 20,
+            paddingBottom: 16,
             background:
               "linear-gradient(180deg, rgba(10,15,30,1) 0%, rgba(10,15,30,0.95) 100%)",
             flexShrink: 0,

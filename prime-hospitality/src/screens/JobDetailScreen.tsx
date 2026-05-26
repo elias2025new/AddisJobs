@@ -40,6 +40,7 @@ export default function JobDetailScreen({ job, onBack, onApply }: JobDetailScree
       >
         {/* ── HEADER ── */}
         <div
+          className="safe-screen-top"
           style={{
             position: "sticky",
             top: 0,
@@ -48,7 +49,9 @@ export default function JobDetailScreen({ job, onBack, onApply }: JobDetailScree
             backdropFilter: "blur(16px)",
             WebkitBackdropFilter: "blur(16px)",
             borderBottom: "1px solid rgba(255,255,255,0.05)",
-            padding: "50px 20px 14px",
+            paddingLeft: 20,
+            paddingRight: 20,
+            paddingBottom: 14,
             display: "flex",
             alignItems: "center",
             gap: 12,
