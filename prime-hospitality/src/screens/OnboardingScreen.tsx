@@ -235,31 +235,23 @@ function Step1_JobField({ state, updateState, onNext }: StepProps) {
 // --- Step 2: Share Contact ---
 function Step2_Contact({ state, updateState, onNext }: StepProps) {
   const { isReady } = useTelegram();
-  const [showPhoneInput, setShowPhoneInput] = useState(false);
-  const [localPhone, setLocalPhone] = useState("");
-  const [phoneError, setPhoneError] = useState("");
 
   const handleYes = () => {
-    // Attempt to request contact via Telegram SDK
-    let detectedPhone = "";
     try {
       const tg = (window as any).Telegram?.WebApp;
       if (tg && tg.requestContact) {
         tg.requestContact((shared: boolean, data: any) => {
-           if (shared) {
-             detectedPhone = data?.contact?.phone_number || data?.phone_number || "";
-             if (detectedPhone) {
-               if (!detectedPhone.startsWith("+")) {
-                 detectedPhone = "+" + detectedPhone;
-               }
-             }
-             setLocalPhone(detectedPhone || "+251");
-             setShowPhoneInput(true);
-           } else {
-             // User denied native sharing but clicked Yes, let them type
-             setLocalPhone("+251");
-             setShowPhoneInput(true);
-           }
+          if (shared) {
+            let phone = data?.contact?.phone_number || data?.phone_number || "";
+            if (phone && !phone.startsWith("+")) {
+              phone = "+" + phone;
+            }
+            updateState({ contactShared: true, phoneNumber: phone });
+          } else {
+            // User dismissed the native prompt — treat as declined
+            updateState({ contactShared: false, phoneNumber: "" });
+          }
+          onNext();
         });
         return;
       }
@@ -267,9 +259,9 @@ function Step2_Contact({ state, updateState, onNext }: StepProps) {
       console.warn("Telegram SDK requestContact error:", e);
     }
 
-    // Fallback for browser testing / non-Telegram environment
-    setLocalPhone("+251963138123"); // prefill with user actual phone number as high fidelity fallback for testing
-    setShowPhoneInput(true);
+    // Fallback for browser/dev environment
+    updateState({ contactShared: true, phoneNumber: "" });
+    onNext();
   };
 
   const handleNo = () => {
@@ -277,158 +269,53 @@ function Step2_Contact({ state, updateState, onNext }: StepProps) {
     onNext();
   };
 
-  const handleConfirmPhone = () => {
-    const trimmed = localPhone.trim();
-    if (!trimmed) {
-      setPhoneError("Phone number cannot be empty.");
-      return;
-    }
-
-    let cleanPhone = trimmed;
-    
-    if (cleanPhone.startsWith("0")) {
-      if (cleanPhone.length !== 10 || !/^\d+$/.test(cleanPhone)) {
-        setPhoneError("Ethiopian phone number must be exactly 10 digits (e.g. 0911223344).");
-        return;
-      }
-      cleanPhone = "+251" + cleanPhone.slice(1);
-    } else if (cleanPhone.startsWith("+")) {
-      if (cleanPhone.length < 10 || !/^\+\d+$/.test(cleanPhone)) {
-        setPhoneError("Please enter a valid international phone number starting with +.");
-        return;
-      }
-    } else if (/^\d{9}$/.test(cleanPhone)) {
-      cleanPhone = "+251" + cleanPhone;
-    } else {
-      setPhoneError("Invalid phone number format. Use 0911223344 or +251911223344.");
-      return;
-    }
-
-    updateState({ contactShared: true, phoneNumber: cleanPhone });
-    onNext();
-  };
-
   return (
-    <div style={{ padding: "80px 20px 40px", flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-      <AnimatePresence mode="wait">
-        {!showPhoneInput ? (
-          <motion.div
-            key="consent"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2 }}
-            style={{ width: "100%", display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}
-          >
-            <div style={{ width: 80, height: 80, borderRadius: "50%", background: "rgba(212,168,67,0.1)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 24 }}>
-              <Smartphone size={36} color="var(--gold)" />
-            </div>
-            <h1 style={{ fontSize: 26, fontWeight: 800, color: "var(--text-primary)", marginBottom: 12, lineHeight: 1.2 }}>
-              Can we share your contact with employers?
-            </h1>
-            <p style={{ fontSize: 15, color: "var(--text-secondary)", marginBottom: 40, maxWidth: 300 }}>
-              This helps employers reach you faster when they want to hire you.
-            </p>
+    <div style={{ padding: "120px 20px 40px", flex: 1, display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
+      <div style={{ width: 80, height: 80, borderRadius: "50%", background: "rgba(212,168,67,0.1)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 24 }}>
+        <Smartphone size={36} color="var(--gold)" />
+      </div>
+      <h1 style={{ fontSize: 26, fontWeight: 800, color: "var(--text-primary)", marginBottom: 12, lineHeight: 1.2 }}>
+        Can we share your contact with employers?
+      </h1>
+      <p style={{ fontSize: 15, color: "var(--text-secondary)", marginBottom: 40, maxWidth: 300 }}>
+        This helps employers reach you faster when they want to hire you.
+      </p>
 
-            <div style={{ display: "flex", flexDirection: "column", gap: 16, width: "100%" }}>
-              <motion.button
-                whileTap={{ scale: 0.96 }}
-                onClick={handleYes}
-                style={{
-                  padding: 20, borderRadius: 16, background: "var(--card)", border: "1px solid var(--gold)",
-                  display: "flex", alignItems: "center", gap: 16, cursor: "pointer", textAlign: "left"
-                }}
-              >
-                <div style={{ width: 40, height: 40, borderRadius: "50%", background: "var(--gold)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <CheckCircle size={20} color="var(--navy)" />
-                </div>
-                <div>
-                  <p style={{ fontSize: 16, fontWeight: 700, color: "var(--text-primary)", marginBottom: 4 }}>Yes, share my contact</p>
-                  <p style={{ fontSize: 13, color: "var(--text-secondary)" }}>Employers can reach you directly</p>
-                </div>
-              </motion.button>
+      <div style={{ display: "flex", flexDirection: "column", gap: 16, width: "100%" }}>
+        <motion.button
+          whileTap={{ scale: 0.96 }}
+          onClick={handleYes}
+          style={{
+            padding: 20, borderRadius: 16, background: "var(--card)", border: "1px solid var(--gold)",
+            display: "flex", alignItems: "center", gap: 16, cursor: "pointer", textAlign: "left"
+          }}
+        >
+          <div style={{ width: 40, height: 40, borderRadius: "50%", background: "var(--gold)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <CheckCircle size={20} color="var(--navy)" />
+          </div>
+          <div>
+            <p style={{ fontSize: 16, fontWeight: 700, color: "var(--text-primary)", marginBottom: 4 }}>Yes, share my contact</p>
+            <p style={{ fontSize: 13, color: "var(--text-secondary)" }}>Employers can reach you directly</p>
+          </div>
+        </motion.button>
 
-              <motion.button
-                whileTap={{ scale: 0.96 }}
-                onClick={handleNo}
-                style={{
-                  padding: 20, borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid var(--border)",
-                  display: "flex", alignItems: "center", gap: 16, cursor: "pointer", textAlign: "left"
-                }}
-              >
-                <div style={{ width: 40, height: 40, borderRadius: "50%", background: "rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <Lock size={20} color="var(--text-muted)" />
-                </div>
-                <div>
-                  <p style={{ fontSize: 16, fontWeight: 700, color: "var(--text-primary)", marginBottom: 4 }}>No, keep it private</p>
-                  <p style={{ fontSize: 13, color: "var(--text-secondary)" }}>You will be contacted through the app only</p>
-                </div>
-              </motion.button>
-            </div>
-          </motion.div>
-        ) : (
-          <motion.div
-            key="phone-input"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2 }}
-            style={{ width: "100%", display: "flex", flexDirection: "column", alignItems: "left", textAlign: "left" }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
-              <motion.button
-                whileTap={{ scale: 0.9 }}
-                onClick={() => setShowPhoneInput(false)}
-                style={{
-                  width: 38, height: 38, borderRadius: 12,
-                  background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.08)",
-                  display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer"
-                }}
-              >
-                <ArrowLeft size={18} color="var(--text-primary)" />
-              </motion.button>
-              <h2 style={{ fontSize: 20, fontWeight: 800, color: "var(--text-primary)", margin: 0 }}>
-                Verify Phone Number
-              </h2>
-            </div>
-            
-            <p style={{ fontSize: 14, color: "var(--text-secondary)", marginBottom: 24, lineHeight: 1.5 }}>
-              Please confirm or enter your actual phone number so employers can call or message you for interviews.
-            </p>
-
-            <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 20 }}>
-              <label style={{ fontSize: 12, fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
-                Phone Number
-              </label>
-              <input
-                type="tel"
-                className="input-base"
-                placeholder="e.g. 0911223344 or +251911223344"
-                value={localPhone}
-                onChange={(e) => {
-                  setLocalPhone(e.target.value);
-                  setPhoneError("");
-                }}
-                autoFocus
-              />
-              {phoneError && (
-                <p style={{ color: "var(--warning)", fontSize: 12, marginTop: 4 }}>
-                  {phoneError}
-                </p>
-              )}
-            </div>
-
-            <motion.button
-              whileTap={{ scale: 0.97 }}
-              onClick={handleConfirmPhone}
-              className="btn-primary"
-              style={{ width: "100%" }}
-            >
-              Verify & Continue
-            </motion.button>
-          </motion.div>
-        )}
-      </AnimatePresence>
+        <motion.button
+          whileTap={{ scale: 0.96 }}
+          onClick={handleNo}
+          style={{
+            padding: 20, borderRadius: 16, background: "rgba(255,255,255,0.03)", border: "1px solid var(--border)",
+            display: "flex", alignItems: "center", gap: 16, cursor: "pointer", textAlign: "left"
+          }}
+        >
+          <div style={{ width: 40, height: 40, borderRadius: "50%", background: "rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <Lock size={20} color="var(--text-muted)" />
+          </div>
+          <div>
+            <p style={{ fontSize: 16, fontWeight: 700, color: "var(--text-primary)", marginBottom: 4 }}>No, keep it private</p>
+            <p style={{ fontSize: 13, color: "var(--text-secondary)" }}>You will be contacted through the app only</p>
+          </div>
+        </motion.button>
+      </div>
     </div>
   );
 }
