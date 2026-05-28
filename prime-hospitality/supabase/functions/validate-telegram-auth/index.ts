@@ -250,6 +250,22 @@ serve(async (req: Request) => {
         userId = newUser.id;
       }
 
+      let phoneToSave = profileData.contactShared ? sanitizeHtml(profileData.phoneNumber || "") : null;
+      
+      // If contact was shared but we don't have the number directly (e.g. from telegram WebApp frontend),
+      // we check the telegram_contacts table which the webhook should have populated.
+      if (profileData.contactShared && !phoneToSave) {
+        const { data: contactData } = await supabase
+          .from("telegram_contacts")
+          .select("phone_number")
+          .eq("telegram_id", telegramId)
+          .single();
+          
+        if (contactData && contactData.phone_number) {
+          phoneToSave = contactData.phone_number;
+        }
+      }
+
       const { error: insertError } = await supabase.from("profiles").insert({
         user_id: userId,
         telegram_id: telegramId,
@@ -257,7 +273,7 @@ serve(async (req: Request) => {
         age: profileData.age,
         location: sanitizeHtml(profileData.location || ""),
         willing_to_relocate: profileData.willingToRelocate,
-        phone_number: profileData.contactShared ? sanitizeHtml(profileData.phoneNumber || "") : null,
+        phone_number: phoneToSave,
         contact_shared: profileData.contactShared,
         selected_categories: profileData.selectedCategories,
         experience_levels: profileData.experienceLevels,
