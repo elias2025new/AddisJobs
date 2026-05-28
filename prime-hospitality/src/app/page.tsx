@@ -117,16 +117,20 @@ export default function App() {
           gap: 16,
         }}
       >
-        <div
+        <motion.div
+          animate={{ scale: [1, 1.06, 1], opacity: [0.85, 1, 0.85] }}
+          transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
           style={{
-            width: 48, height: 48, borderRadius: 14,
-            background: "linear-gradient(135deg, #D4A843 0%, #B8922E 100%)",
+            width: 72, height: 72, borderRadius: 18,
             display: "flex", alignItems: "center", justifyContent: "center",
-            fontSize: 24, fontWeight: 800, color: "#0A0F1E",
+            overflow: "hidden",
+            boxShadow: "0 8px 32px rgba(212,168,67,0.15)",
+            border: "1px solid rgba(212,168,67,0.2)",
+            background: "linear-gradient(135deg, rgba(20,25,45,1) 0%, rgba(10,15,30,1) 100%)",
           }}
         >
-          P
-        </div>
+          <img src="/logo.png" alt="Prime Hospitality Logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+        </motion.div>
         <p style={{ fontSize: 14, color: "var(--text-muted)", fontWeight: 500 }}>
           Loading Prime Hospitality…
         </p>

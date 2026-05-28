@@ -77,16 +77,14 @@ export default function HomeScreen({ onJobSelect, onSearchPress }: HomeScreenPro
                     width: 32,
                     height: 32,
                     borderRadius: 8,
-                    background: "linear-gradient(135deg, #D4A843 0%, #B8922E 100%)",
+                    overflow: "hidden",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    fontSize: 16,
-                    fontWeight: 800,
-                    color: "#0A0F1E",
+                    border: "1px solid rgba(212,168,67,0.2)"
                   }}
                 >
-                  P
+                  <img src="/logo.png" alt="Logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                 </div>
                 <span
                   style={{
