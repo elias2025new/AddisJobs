@@ -216,10 +216,10 @@ export default function ProfileScreen() {
                 </div>
                 <div>
                   <p style={{ fontSize: 14, fontWeight: 700, color: "var(--gold)", marginBottom: 4 }}>
-                    Privacy Assured
+                    Only Visible to Employers
                   </p>
                   <p style={{ fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.4 }}>
-                    Your profile details and contact information are strictly confidential and only visible to verified employers.
+                    Your profile and contact info are strictly confidential. They are only viewable by verified companies, and never by other job seekers.
                   </p>
                 </div>
               </div>
