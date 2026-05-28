@@ -149,9 +149,10 @@ function Step1_JobField({ state, updateState, onNext }: StepProps) {
       </h1>
       <p style={{ fontSize: 15, color: "var(--text-secondary)", marginBottom: 32 }}>Select up to 3 categories.</p>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: "auto" }}>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: "12px 18px", marginBottom: "auto" }}>
         {JOB_CATEGORIES_DATA.map((cat) => {
-          const isSelected = state.selectedCategories.includes(cat.label);
+          const selectedIndex = state.selectedCategories.indexOf(cat.label);
+          const isSelected = selectedIndex !== -1;
           const isShaking = shakeId === cat.label;
           return (
             <motion.button
@@ -161,16 +162,41 @@ function Step1_JobField({ state, updateState, onNext }: StepProps) {
               transition={isShaking ? { duration: 0.3 } : {}}
               onClick={() => toggleCategory(cat.label)}
               style={{
-                padding: "16px", borderRadius: 16,
-                background: isSelected ? "var(--gold)" : "var(--card)",
-                border: isSelected ? "1px solid var(--gold)" : "1px solid var(--border)",
-                display: "flex", flexDirection: "column", alignItems: "center", gap: 8,
-                cursor: "pointer", transition: "background 0.2s"
+                background: "none",
+                border: "none",
+                padding: "6px 0",
+                display: "inline-flex",
+                alignItems: "center",
+                cursor: "pointer",
+                fontFamily: "inherit",
               }}
             >
-              <span style={{ fontSize: 24 }}>{cat.emoji}</span>
-              <span style={{ fontSize: 14, fontWeight: 600, color: isSelected ? "var(--navy)" : "var(--text-primary)" }}>
+              <span style={{
+                fontSize: 16,
+                fontWeight: isSelected ? 700 : 500,
+                color: isSelected ? "var(--gold)" : "var(--text-secondary)",
+                transition: "color 0.2s, font-weight 0.2s",
+                display: "inline-flex",
+                alignItems: "center",
+              }}>
                 {cat.label}
+                {isSelected && (
+                  <span style={{
+                    marginLeft: 6,
+                    fontSize: 11,
+                    fontWeight: 800,
+                    background: "var(--gold)",
+                    color: "var(--navy)",
+                    borderRadius: "50%",
+                    width: 18,
+                    height: 18,
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}>
+                    {selectedIndex + 1}
+                  </span>
+                )}
               </span>
             </motion.button>
           );
