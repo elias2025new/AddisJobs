@@ -121,15 +121,14 @@ export default function App() {
           animate={{ scale: [1, 1.06, 1], opacity: [0.85, 1, 0.85] }}
           transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
           style={{
-            width: 72, height: 72, borderRadius: 18,
+            width: 72, height: 72, borderRadius: "50%",
             display: "flex", alignItems: "center", justifyContent: "center",
             overflow: "hidden",
-            boxShadow: "0 8px 32px rgba(212,168,67,0.15)",
-            border: "1px solid rgba(212,168,67,0.2)",
-            background: "linear-gradient(135deg, rgba(20,25,45,1) 0%, rgba(10,15,30,1) 100%)",
+            boxShadow: "0 8px 32px rgba(212,168,67,0.25), inset 0 0 0 1px rgba(255,255,255,0.1)",
+            background: "linear-gradient(135deg, rgba(30,35,55,1) 0%, rgba(10,15,30,1) 100%)",
           }}
         >
-          <img src="/logo.png" alt="Prime Hospitality Logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          <img src="/logo.png" alt="Prime Hospitality Logo" style={{ width: "100%", height: "100%", objectFit: "contain", padding: "12px" }} />
         </motion.div>
         <p style={{ fontSize: 14, color: "var(--text-muted)", fontWeight: 500 }}>
           Loading Prime Hospitality…
