@@ -245,7 +245,7 @@ export default function ProfileScreen() {
                     <Phone size={14} color="var(--gold)" /> Phone
                   </span>
                   <span style={{ fontSize: 13, color: "var(--text-primary)", fontWeight: 600 }}>
-                    {profile.phone_number || "Not Shared"}
+                    {profile.phone_number ? profile.phone_number : (profile.contact_shared ? "Shared via Telegram" : "Not Shared")}
                   </span>
                 </div>
 
