@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { motion, LazyMotion, domAnimation } from "framer-motion";
-import { User, Phone, MapPin, Briefcase, FileText, RefreshCw, CheckCircle, HelpCircle } from "lucide-react";
+import { User, Phone, MapPin, Briefcase, FileText, RefreshCw, CheckCircle, HelpCircle, ShieldCheck } from "lucide-react";
 import { fetchProfile as fetchProfileApi } from "@/lib/api";
 import { useTelegram } from "@/hooks/useTelegram";
 
@@ -196,6 +196,31 @@ export default function ProfileScreen() {
                   >
                     <CheckCircle size={10} /> Profile Completed
                   </span>
+                </div>
+              </div>
+
+              {/* Privacy Notice */}
+              <div
+                style={{
+                  background: "rgba(212,168,67,0.08)",
+                  border: "1px dashed rgba(212,168,67,0.3)",
+                  borderRadius: 16,
+                  padding: "14px 16px",
+                  display: "flex",
+                  alignItems: "flex-start",
+                  gap: 12,
+                }}
+              >
+                <div style={{ marginTop: 2, background: "rgba(212,168,67,0.15)", borderRadius: "50%", padding: 6, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <ShieldCheck size={18} color="var(--gold)" />
+                </div>
+                <div>
+                  <p style={{ fontSize: 14, fontWeight: 700, color: "var(--gold)", marginBottom: 4 }}>
+                    Privacy Assured
+                  </p>
+                  <p style={{ fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.4 }}>
+                    Your profile details and contact information are strictly confidential and only visible to verified employers.
+                  </p>
                 </div>
               </div>
 
