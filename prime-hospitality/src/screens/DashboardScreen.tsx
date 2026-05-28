@@ -42,7 +42,11 @@ function timeAgo(dateStr: string): string {
 
 // ── Post-job form constants ───────────────────────────────────────────────────
 const POST_NEIGHBORHOODS = ["Bole","Kazanchis","CMC","Megenagna","Sarbet","Piassa","Taitu","Gerji","Ayat","Lideta","Kirkos","Yeka"];
-const POST_CATEGORIES    = ["Waiter","Chef","Barista","Receptionist","Housekeeper","Security","Cashier","Manager"];
+const POST_CATEGORIES    = [
+  "Waiter", "Chef", "Barista", "Receptionist", "Housekeeper", "Security", "Cashier", "Manager",
+  "Marketing & Sales", "F&B", "Finance", "Cost Control", "Accountant", "Bellboy", "Store Keeper",
+  "Phone Operator", "Maintenance"
+];
 const POST_JOB_TYPES     = ["Full Time","Part Time","Contract"] as const;
 const POST_EXP_LEVELS    = ["Entry Level","Mid Level","Senior Level"] as const;
 

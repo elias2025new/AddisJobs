@@ -21,6 +21,9 @@ const EXPERIENCE_LEVELS: ExperienceLevel[] = ["Entry Level", "Mid Level", "Senio
 const CATEGORIES: JobCategory[] = [
   "Waiter", "Chef", "Receptionist", "Barista",
   "Housekeeper", "Security", "Cashier", "Manager",
+  "Marketing & Sales", "F&B", "Finance", "Cost Control",
+  "Accountant", "Bellboy", "Store Keeper", "Phone Operator",
+  "Maintenance",
 ];
 const EDUCATION_OPTIONS = [
   "Grade 12 / High School",

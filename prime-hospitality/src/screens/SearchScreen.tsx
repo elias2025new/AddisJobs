@@ -14,6 +14,9 @@ interface SearchScreenProps {
 const CATEGORY_EMOJIS: Record<string, string> = {
   Waiter: "💁", Chef: "🍳", Receptionist: "🛎️", Barista: "☕",
   Housekeeper: "🧹", Security: "🛡️", Cashier: "💵", Manager: "💼",
+  "Marketing & Sales": "📈", "F&B": "🍹", Finance: "💰", "Cost Control": "📊",
+  Accountant: "🧮", Bellboy: "🧳", "Store Keeper": "📦", "Phone Operator": "📞",
+  Maintenance: "🔧",
 };
 
 function useDebounce<T>(value: T, delay: number): T {

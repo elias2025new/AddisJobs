@@ -33,6 +33,15 @@ export default function FilterChips({ selected, onSelect }: FilterChipsProps) {
     Security: "🛡️",
     Cashier: "💳",
     Manager: "📋",
+    "Marketing & Sales": "📈",
+    "F&B": "🍹",
+    Finance: "💰",
+    "Cost Control": "📊",
+    Accountant: "🧮",
+    Bellboy: "🧳",
+    "Store Keeper": "📦",
+    "Phone Operator": "📞",
+    Maintenance: "🔧",
   };
 
   return (

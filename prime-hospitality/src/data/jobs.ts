@@ -8,7 +8,16 @@ export type JobCategory =
   | "Housekeeper"
   | "Security"
   | "Cashier"
-  | "Manager";
+  | "Manager"
+  | "Marketing & Sales"
+  | "F&B"
+  | "Finance"
+  | "Cost Control"
+  | "Accountant"
+  | "Bellboy"
+  | "Store Keeper"
+  | "Phone Operator"
+  | "Maintenance";
 
 export interface Job {
   id: string;
@@ -265,4 +274,13 @@ export const JOB_CATEGORIES: JobCategory[] = [
   "Security",
   "Cashier",
   "Manager",
+  "Marketing & Sales",
+  "F&B",
+  "Finance",
+  "Cost Control",
+  "Accountant",
+  "Bellboy",
+  "Store Keeper",
+  "Phone Operator",
+  "Maintenance",
 ];
