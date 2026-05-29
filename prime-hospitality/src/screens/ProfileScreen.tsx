@@ -65,13 +65,6 @@ export default function ProfileScreen() {
     return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
   };
 
-  const getCVFilename = (url: string | null) => {
-    if (!url) return "";
-    const parts = url.split("/");
-    const filename = parts[parts.length - 1];
-    return decodeURIComponent(filename.split("-").slice(1).join("-") || filename);
-  };
-
   return (
     <LazyMotion features={domAnimation}>
       <div
@@ -315,7 +308,7 @@ export default function ProfileScreen() {
                       <>
                         <CheckCircle size={12} color="var(--success)" />
                         <span style={{ textDecoration: "underline", color: "var(--gold)", cursor: "pointer" }} onClick={() => profile.cv_url && window.open(profile.cv_url, "_blank")}>
-                          {getCVFilename(profile.cv_url)}
+                          View CV
                         </span>
                       </>
                     ) : (
