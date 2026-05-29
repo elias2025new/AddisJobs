@@ -34,6 +34,7 @@ export default function App() {
   
   // Onboarding state
   const [isOnboarded, setIsOnboarded] = useState<boolean | null>(null);
+  const [userProfile, setUserProfile] = useState<any>(null);
 
   // Check onboarding status via Edge Function (uses service-role key, bypasses RLS)
   useEffect(() => {
@@ -50,6 +51,7 @@ export default function App() {
       try {
         const result = await fetchProfile(initData);
         setIsOnboarded(result.onboarding_completed);
+        setUserProfile(result.profile);
       } catch (err) {
         console.error("Error checking onboarding status:", err);
         setIsOnboarded(false);
@@ -204,6 +206,7 @@ export default function App() {
             key="home"
             onJobSelect={handleJobSelect}
             onSearchPress={() => setActiveTab("search")}
+            profileName={userProfile?.full_name}
           />
         );
       case "search":
@@ -220,6 +223,7 @@ export default function App() {
             key="home"
             onJobSelect={handleJobSelect}
             onSearchPress={() => setActiveTab("search")}
+            profileName={userProfile?.full_name}
           />
         );
     }

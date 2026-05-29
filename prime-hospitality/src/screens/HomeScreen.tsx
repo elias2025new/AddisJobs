@@ -14,9 +14,10 @@ import { useTelegram } from "@/hooks/useTelegram";
 interface HomeScreenProps {
   onJobSelect: (job: Job) => void;
   onSearchPress?: () => void;
+  profileName?: string;
 }
 
-export default function HomeScreen({ onJobSelect, onSearchPress }: HomeScreenProps) {
+export default function HomeScreen({ onJobSelect, onSearchPress, profileName }: HomeScreenProps) {
 
   const shouldReduceMotion = useReducedMotion();
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -32,7 +33,7 @@ export default function HomeScreen({ onJobSelect, onSearchPress }: HomeScreenPro
     overscan: 3,
   });
 
-  const greetingName = user?.firstName ?? "there";
+  const greetingName = profileName ? profileName.split(" ")[0] : (user?.firstName ?? "there");
 
   return (
     <LazyMotion features={domAnimation}>
@@ -105,7 +106,7 @@ export default function HomeScreen({ onJobSelect, onSearchPress }: HomeScreenPro
                 </span>
               </div>
               <p style={{ fontSize: 13, color: "var(--text-secondary)", marginLeft: 40 }}>
-                Hello, {greetingName} 👋
+                Hello, {greetingName}
               </p>
             </div>
 
