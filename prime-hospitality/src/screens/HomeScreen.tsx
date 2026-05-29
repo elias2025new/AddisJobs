@@ -4,10 +4,10 @@ import { useState, useMemo, useRef, useCallback } from "react";
 import { motion, useReducedMotion, LazyMotion, domAnimation } from "framer-motion";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { Search, Bell } from "lucide-react";
-import { Job, JobCategory } from "@/data/jobs";
+import { Job } from "@/data/jobs";
 
 import JobCard from "@/components/JobCard";
-import FilterChips from "@/components/FilterChips";
+
 import { useJobs } from "@/hooks/useJobs";
 import { useTelegram } from "@/hooks/useTelegram";
 
@@ -17,13 +17,13 @@ interface HomeScreenProps {
 }
 
 export default function HomeScreen({ onJobSelect, onSearchPress }: HomeScreenProps) {
-  const [selectedCategory, setSelectedCategory] = useState<JobCategory | null>(null);
+
   const shouldReduceMotion = useReducedMotion();
   const scrollRef = useRef<HTMLDivElement>(null);
   const { user } = useTelegram();
 
   // Load real active jobs from Supabase
-  const { jobs, isLoading, error, refetch } = useJobs(selectedCategory);
+  const { jobs, isLoading, error, refetch } = useJobs(null);
 
   const virtualizer = useVirtualizer({
     count: jobs.length,
@@ -76,16 +76,16 @@ export default function HomeScreen({ onJobSelect, onSearchPress }: HomeScreenPro
                   style={{
                     width: 32,
                     height: 32,
-                    borderRadius: "50%",
+                    borderRadius: 8,
                     overflow: "hidden",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    boxShadow: "inset 0 0 0 1px rgba(212,168,67,0.3)",
-                    background: "rgba(255,255,255,0.05)"
+                    background: "linear-gradient(145deg, rgba(45,50,70,1) 0%, rgba(15,20,35,1) 100%)",
+                    boxShadow: "0 6px 12px rgba(0,0,0,0.6), 0 2px 4px rgba(0,0,0,0.4), inset 0 1px 1px rgba(255,255,255,0.15), inset 0 -1px 2px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(212,168,67,0.5)"
                   }}
                 >
-                  <img src="/logo.png" alt="Logo" style={{ width: "100%", height: "100%", objectFit: "contain", padding: "6px" }} />
+                  <img src="/logo.png" alt="Logo" style={{ width: "100%", height: "100%", objectFit: "contain", padding: "4px" }} />
                 </div>
                 <span
                   style={{
@@ -194,15 +194,7 @@ export default function HomeScreen({ onJobSelect, onSearchPress }: HomeScreenPro
           </div>
         </motion.div>
 
-        {/* ── FILTER CHIPS ── */}
-        <motion.div
-          initial={shouldReduceMotion ? false : { opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.3, delay: 0.1 }}
-          style={{ paddingTop: 12, paddingBottom: 12, flexShrink: 0 }}
-        >
-          <FilterChips selected={selectedCategory} onSelect={setSelectedCategory} />
-        </motion.div>
+
 
         {/* ── SECTION HEADER ── */}
         <div
@@ -223,7 +215,7 @@ export default function HomeScreen({ onJobSelect, onSearchPress }: HomeScreenPro
               color: "var(--text-primary)",
             }}
           >
-            {selectedCategory ? `${selectedCategory} Jobs` : "All Jobs"}{" "}
+            All Jobs{" "}
             <span style={{ color: "var(--text-muted)", fontWeight: 500 }}>
               ({jobs.length})
             </span>
