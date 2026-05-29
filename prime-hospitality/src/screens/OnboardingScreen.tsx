@@ -404,7 +404,7 @@ function Step4_Personal({ state, updateState, onNext }: StepProps) {
     else setAgeError("");
   };
 
-  const canProceed = state.fullName.length > 2 && state.age !== "" && state.age >= 16 && state.age <= 60 && state.location !== "";
+  const canProceed = state.fullName.length > 2 && state.age !== "" && state.age >= 16 && state.age <= 60 && state.location !== "" && state.gender !== "";
 
   return (
     <div style={{ padding: "80px 20px 40px", flex: 1, display: "flex", flexDirection: "column" }}>
@@ -423,6 +423,50 @@ function Step4_Personal({ state, updateState, onNext }: StepProps) {
           <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "var(--text-secondary)", marginBottom: 8, textTransform: "uppercase" }}>Age</label>
           <input type="number" className="input-base" placeholder="18" value={state.age} onChange={handleAgeChange} />
           {ageError && <p style={{ color: "var(--warning)", fontSize: 12, marginTop: 6 }}>{ageError}</p>}
+        </div>
+
+        {/* Gender Selector */}
+        <div>
+          <label style={{ display: "block", fontSize: 13, fontWeight: 600, color: "var(--text-secondary)", marginBottom: 12, textTransform: "uppercase" }}>Gender</label>
+          <div style={{ display: "flex", gap: 12 }}>
+            {(["male", "female"] as const).map((g) => {
+              const isSelected = state.gender === g;
+              return (
+                <motion.button
+                  key={g}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => updateState({ gender: g })}
+                  style={{
+                    flex: 1, padding: "16px 12px", borderRadius: 16, cursor: "pointer",
+                    fontFamily: "inherit", display: "flex", flexDirection: "column",
+                    alignItems: "center", gap: 10,
+                    background: isSelected ? "rgba(212,168,67,0.12)" : "var(--card)",
+                    border: isSelected ? "1.5px solid var(--gold)" : "1px solid var(--border)",
+                  }}
+                >
+                  {/* SVG figure */}
+                  {g === "male" ? (
+                    <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                      <circle cx="20" cy="11" r="7" fill={isSelected ? "#D4A843" : "#8B9BBE"} />
+                      <path d="M8 38c0-6.627 5.373-12 12-12s12 5.373 12 12" stroke={isSelected ? "#D4A843" : "#8B9BBE"} strokeWidth="3" strokeLinecap="round" fill="none"/>
+                    </svg>
+                  ) : (
+                    <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                      <circle cx="20" cy="11" r="7" fill={isSelected ? "#D4A843" : "#8B9BBE"} />
+                      <path d="M20 18v4M11 26c0-2.761 4.029-5 9-5s9 2.239 9 5" stroke={isSelected ? "#D4A843" : "#8B9BBE"} strokeWidth="2.5" strokeLinecap="round" fill="none"/>
+                      <path d="M13 32c0 0 1.5-4 7-4s7 4 7 4" stroke={isSelected ? "#D4A843" : "#8B9BBE"} strokeWidth="2.5" strokeLinecap="round" fill="none"/>
+                      <ellipse cx="20" cy="31" rx="7" ry="4" fill={isSelected ? "rgba(212,168,67,0.2)" : "rgba(139,155,190,0.15)"}/>
+                    </svg>
+                  )}
+                  <span style={{
+                    fontSize: 14, fontWeight: 700,
+                    color: isSelected ? "var(--gold)" : "var(--text-secondary)",
+                    textTransform: "capitalize",
+                  }}>{g}</span>
+                </motion.button>
+              );
+            })}
+          </div>
         </div>
 
         <div>
@@ -459,6 +503,7 @@ function Step4_Personal({ state, updateState, onNext }: StepProps) {
     </div>
   );
 }
+
 
 // --- Step 5: CV Upload ---
 function Step5_CV({ state, updateState, onNext }: StepProps) {

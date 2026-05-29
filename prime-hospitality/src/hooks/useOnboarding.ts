@@ -15,6 +15,7 @@ export interface OnboardingState {
   age: number | "";
   location: string;
   willingToRelocate: boolean;
+  gender: "male" | "female" | "";
   cvFile: File | null;
   cvUploaded: boolean;
   isSubmitting: boolean;
@@ -31,6 +32,7 @@ const initialState: OnboardingState = {
   age: "",
   location: "",
   willingToRelocate: false,
+  gender: "",
   cvFile: null,
   cvUploaded: false,
   isSubmitting: false,

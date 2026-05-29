@@ -2,9 +2,63 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { motion, LazyMotion, domAnimation, AnimatePresence } from "framer-motion";
-import { User, Phone, MapPin, Briefcase, FileText, RefreshCw, CheckCircle, HelpCircle, ShieldCheck, Settings } from "lucide-react";
+import { Phone, MapPin, Briefcase, FileText, RefreshCw, CheckCircle, HelpCircle, ShieldCheck, Settings, AlertCircle } from "lucide-react";
 import { fetchProfile as fetchProfileApi } from "@/lib/api";
 import { useTelegram } from "@/hooks/useTelegram";
+
+// ── Profile completion helpers ──────────────────────────────────────────────
+interface CompletionSection {
+  key: string;
+  label: string;
+  description: string;
+  done: boolean;
+  weight: number; // points out of 100
+}
+
+function getCompletionSections(profile: Profile): CompletionSection[] {
+  return [
+    {
+      key: "personal",
+      label: "Personal Info",
+      description: "Full name, age & location filled in.",
+      done: !!(profile.full_name && profile.age && profile.location),
+      weight: 20,
+    },
+    {
+      key: "contact",
+      label: "Phone / Contact",
+      description: "Share your contact so employers can reach you.",
+      done: !!(profile.contact_shared),
+      weight: 20,
+    },
+    {
+      key: "roles",
+      label: "Job Roles Selected",
+      description: "Pick the roles you're looking for.",
+      done: !!(profile.selected_categories && profile.selected_categories.length > 0),
+      weight: 20,
+    },
+    {
+      key: "experience",
+      label: "Experience Levels",
+      description: "Set your experience level for each role.",
+      done: !!(profile.selected_categories && profile.selected_categories.length > 0 &&
+        profile.selected_categories.every((c) => !!profile.experience_levels?.[c])),
+      weight: 20,
+    },
+    {
+      key: "cv",
+      label: "Resume (CV)",
+      description: "Upload your CV to stand out to employers.",
+      done: !!(profile.cv_url),
+      weight: 20,
+    },
+  ];
+}
+
+function getCompletionScore(sections: CompletionSection[]) {
+  return sections.reduce((acc, s) => acc + (s.done ? s.weight : 0), 0);
+}
 
 interface Profile {
   id: string;
@@ -18,6 +72,7 @@ interface Profile {
   selected_categories: string[];
   experience_levels: Record<string, string>;
   cv_url: string | null;
+  gender: "male" | "female" | null;
   created_at: string;
 }
 
@@ -26,7 +81,18 @@ export default function ProfileScreen() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [privacyDismissed, setPrivacyDismissed] = useState(false);
+  const [privacyDismissed, setPrivacyDismissed] = useState<boolean>(() => {
+    try { return localStorage.getItem("profile_privacy_dismissed") === "true"; } catch { return false; }
+  });
+
+  const dismissPrivacy = () => {
+    setPrivacyDismissed(true);
+    try { localStorage.setItem("profile_privacy_dismissed", "true"); } catch {}
+  };
+  const restorePrivacy = () => {
+    setPrivacyDismissed(false);
+    try { localStorage.removeItem("profile_privacy_dismissed"); } catch {}
+  };
 
   const fetchProfile = useCallback(async () => {
     setIsLoading(true);
@@ -58,13 +124,6 @@ export default function ProfileScreen() {
     fetchProfile();
   }, [fetchProfile]);
 
-  const getInitials = (name: string) => {
-    if (!name) return "U";
-    const parts = name.trim().split(/\s+/);
-    if (parts.length === 0) return "U";
-    if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
-    return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
-  };
 
   return (
     <LazyMotion features={domAnimation}>
@@ -146,77 +205,203 @@ export default function ProfileScreen() {
               transition={{ duration: 0.25 }}
               style={{ display: "flex", flexDirection: "column", gap: 16 }}
             >
-              {/* Profile Card */}
-              <div
-                style={{
-                  background: "linear-gradient(135deg, var(--surface-elevated) 0%, var(--card) 100%)",
-                  border: "1px solid rgba(212,168,67,0.15)",
-                  borderRadius: 20,
-                  padding: 20,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "space-between",
-                  gap: 16,
-                }}
-              >
-                <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-                  {/* Avatar */}
-                  <div
-                    style={{
-                      width: 60, height: 60, borderRadius: "50%",
-                      background: "linear-gradient(135deg, #D4A843 0%, #B8922E 100%)",
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                      fontSize: 22, fontWeight: 800, color: "#0A0F1E",
-                      flexShrink: 0,
-                      boxShadow: "0 4px 12px rgba(212,168,67,0.2)",
-                    }}
-                  >
-                    {getInitials(profile.full_name)}
-                  </div>
-                  <div>
-                    <h2 style={{ fontSize: 18, fontWeight: 800, color: "var(--text-primary)", marginBottom: 2 }}>
-                      {profile.full_name}
-                    </h2>
-                    <p style={{ fontSize: 13, color: "var(--gold)", marginBottom: 6, fontWeight: 600 }}>
-                      Age: {profile.age} · {profile.willing_to_relocate ? "Willing to relocate" : "Local only"}
-                    </p>
-                    <span
+              {(() => {
+                const sections = getCompletionSections(profile);
+                const score = getCompletionScore(sections);
+                const incomplete = sections.filter((s) => !s.done);
+                const isFullyDone = score === 100;
+                return (
+                  <>
+                    {/* ── Avatar / name card ── */}
+                    <div
                       style={{
-                        fontSize: 11, fontWeight: 600,
-                        color: "var(--success)",
-                        background: "rgba(74,222,128,0.08)",
-                        border: "1px solid rgba(74,222,128,0.2)",
-                        borderRadius: 100, padding: "3px 10px",
-                        display: "inline-flex", alignItems: "center", gap: 4
+                        background: "linear-gradient(135deg, var(--surface-elevated) 0%, var(--card) 100%)",
+                        border: "1px solid rgba(212,168,67,0.15)",
+                        borderRadius: 20,
+                        padding: 20,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "space-between",
+                        gap: 16,
                       }}
                     >
-                      <CheckCircle size={10} /> Profile Completed
-                    </span>
-                  </div>
-                </div>
+                      <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+                        {/* Avatar */}
+                        <div
+                          style={{
+                            width: 60, height: 60, borderRadius: "50%",
+                            background: "linear-gradient(135deg, #D4A843 0%, #B8922E 100%)",
+                            display: "flex", alignItems: "center", justifyContent: "center",
+                            fontSize: 22, fontWeight: 800, color: "#0A0F1E",
+                            flexShrink: 0,
+                            boxShadow: "0 4px 12px rgba(212,168,67,0.2)",
+                          }}
+                        >
+                          {getInitials(profile.full_name)}
+                        </div>
+                        <div>
+                          <h2 style={{ fontSize: 18, fontWeight: 800, color: "var(--text-primary)", marginBottom: 2 }}>
+                            {profile.full_name}
+                          </h2>
+                          <p style={{ fontSize: 13, color: "var(--gold)", marginBottom: 6, fontWeight: 600 }}>
+                            Age: {profile.age} · {profile.willing_to_relocate ? "Willing to relocate" : "Local only"}
+                          </p>
+                          <span
+                            style={{
+                              fontSize: 11, fontWeight: 600,
+                              color: isFullyDone ? "var(--success)" : "var(--warning, #F59E0B)",
+                              background: isFullyDone ? "rgba(74,222,128,0.08)" : "rgba(245,158,11,0.08)",
+                              border: isFullyDone ? "1px solid rgba(74,222,128,0.2)" : "1px solid rgba(245,158,11,0.25)",
+                              borderRadius: 100, padding: "3px 10px",
+                              display: "inline-flex", alignItems: "center", gap: 4
+                            }}
+                          >
+                            {isFullyDone ? (
+                              <><CheckCircle size={10} /> Profile Complete</>
+                            ) : (
+                              <><AlertCircle size={10} /> {score}% Complete</>
+                            )}
+                          </span>
+                        </div>
+                      </div>
 
-                {/* Settings button */}
-                <motion.button
-                  whileTap={{ scale: 0.9 }}
-                  onClick={() => {
-                    if (typeof window !== "undefined" && (window as any).Telegram?.WebApp) {
-                      (window as any).Telegram.WebApp.showAlert("Settings options coming soon!");
-                    } else {
-                      alert("Settings options coming soon!");
-                    }
-                  }}
-                  style={{
-                    width: 38, height: 38, borderRadius: 12,
-                    background: "rgba(255,255,255,0.05)",
-                    border: "1px solid rgba(255,255,255,0.08)",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    cursor: "pointer",
-                    flexShrink: 0,
-                  }}
-                >
-                  <Settings size={18} color="var(--text-secondary)" />
-                </motion.button>
-              </div>
+                      {/* Settings button */}
+                      <motion.button
+                        whileTap={{ scale: 0.9 }}
+                        onClick={() => {
+                          if (typeof window !== "undefined" && (window as any).Telegram?.WebApp) {
+                            (window as any).Telegram.WebApp.showAlert("Settings options coming soon!");
+                          } else {
+                            alert("Settings options coming soon!");
+                          }
+                        }}
+                        style={{
+                          width: 38, height: 38, borderRadius: 12,
+                          background: "rgba(255,255,255,0.05)",
+                          border: "1px solid rgba(255,255,255,0.08)",
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                          cursor: "pointer",
+                          flexShrink: 0,
+                        }}
+                      >
+                        <Settings size={18} color="var(--text-secondary)" />
+                      </motion.button>
+                    </div>
+
+                    {/* ── Profile Completion Progress Bar ── */}
+                    <div
+                      style={{
+                        background: "var(--card)",
+                        border: isFullyDone ? "1px solid rgba(74,222,128,0.2)" : "1px solid rgba(245,158,11,0.2)",
+                        borderRadius: 16,
+                        padding: 16,
+                      }}
+                    >
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+                        <span style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary)" }}>
+                          Profile Strength
+                        </span>
+                        <span style={{
+                          fontSize: 13, fontWeight: 800,
+                          color: isFullyDone ? "var(--success)" : "var(--gold)",
+                        }}>
+                          {score}%
+                        </span>
+                      </div>
+
+                      {/* Track */}
+                      <div style={{ height: 8, background: "rgba(255,255,255,0.06)", borderRadius: 100, overflow: "hidden" }}>
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{ width: `${score}%` }}
+                          transition={{ duration: 0.6, ease: "easeOut" }}
+                          style={{
+                            height: "100%",
+                            borderRadius: 100,
+                            background: isFullyDone
+                              ? "linear-gradient(90deg, #4ADE80 0%, #22C55E 100%)"
+                              : "linear-gradient(90deg, #D4A843 0%, #F59E0B 100%)",
+                          }}
+                        />
+                      </div>
+
+                      {/* Section dots */}
+                      <div style={{ display: "flex", gap: 6, marginTop: 12, flexWrap: "wrap" }}>
+                        {sections.map((s) => (
+                          <div
+                            key={s.key}
+                            style={{
+                              display: "flex", alignItems: "center", gap: 5,
+                              fontSize: 11, fontWeight: 600,
+                              color: s.done ? "var(--success)" : "rgba(255,255,255,0.35)",
+                            }}
+                          >
+                            <div style={{
+                              width: 7, height: 7, borderRadius: "50%",
+                              background: s.done ? "var(--success)" : "rgba(255,255,255,0.15)",
+                              flexShrink: 0,
+                            }} />
+                            {s.label}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* ── Incomplete section nudge cards ── */}
+                    {incomplete.length > 0 && (
+                      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                        <p style={{ fontSize: 12, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                          Complete your profile
+                        </p>
+                        {incomplete.map((s) => (
+                          <motion.div
+                            key={s.key}
+                            initial={{ opacity: 0, x: -8 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            style={{
+                              background: "rgba(245,158,11,0.06)",
+                              border: "1px solid rgba(245,158,11,0.18)",
+                              borderRadius: 12,
+                              padding: "12px 14px",
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 12,
+                            }}
+                          >
+                            <div style={{
+                              width: 32, height: 32, borderRadius: 10,
+                              background: "rgba(245,158,11,0.12)",
+                              display: "flex", alignItems: "center", justifyContent: "center",
+                              flexShrink: 0,
+                            }}>
+                              <AlertCircle size={16} color="#F59E0B" />
+                            </div>
+                            <div style={{ flex: 1 }}>
+                              <p style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary)", marginBottom: 2 }}>
+                                {s.label}
+                              </p>
+                              <p style={{ fontSize: 12, color: "var(--text-muted)" }}>
+                                {s.description}
+                              </p>
+                            </div>
+                            <span style={{
+                              fontSize: 11, fontWeight: 700,
+                              color: "#F59E0B",
+                              background: "rgba(245,158,11,0.12)",
+                              border: "1px solid rgba(245,158,11,0.25)",
+                              borderRadius: 100,
+                              padding: "3px 8px",
+                              flexShrink: 0,
+                            }}>
+                              +{s.weight}%
+                            </span>
+                          </motion.div>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
 
               {/* Privacy Notice */}
               <AnimatePresence mode="wait">
@@ -232,7 +417,7 @@ export default function ProfileScreen() {
                   >
                     <motion.button
                       whileTap={{ scale: 0.88 }}
-                      onClick={() => setPrivacyDismissed(false)}
+                      onClick={() => restorePrivacy()}
                       title="Show privacy notice"
                       style={{
                         width: 28, height: 28,
@@ -279,7 +464,7 @@ export default function ProfileScreen() {
                     {/* OK button */}
                     <motion.button
                       whileTap={{ scale: 0.88 }}
-                      onClick={() => setPrivacyDismissed(true)}
+                      onClick={() => dismissPrivacy()}
                       style={{
                         flexShrink: 0,
                         alignSelf: "center",
