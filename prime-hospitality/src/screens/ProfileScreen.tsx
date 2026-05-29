@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { motion, LazyMotion, domAnimation } from "framer-motion";
-import { User, Phone, MapPin, Briefcase, FileText, RefreshCw, CheckCircle, HelpCircle, ShieldCheck } from "lucide-react";
+import { User, Phone, MapPin, Briefcase, FileText, RefreshCw, CheckCircle, HelpCircle, ShieldCheck, Settings } from "lucide-react";
 import { fetchProfile as fetchProfileApi } from "@/lib/api";
 import { useTelegram } from "@/hooks/useTelegram";
 
@@ -154,42 +154,67 @@ export default function ProfileScreen() {
                   padding: 20,
                   display: "flex",
                   alignItems: "center",
+                  justifyContent: "space-between",
                   gap: 16,
                 }}
               >
-                {/* Avatar */}
-                <div
-                  style={{
-                    width: 60, height: 60, borderRadius: "50%",
-                    background: "linear-gradient(135deg, #D4A843 0%, #B8922E 100%)",
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    fontSize: 22, fontWeight: 800, color: "#0A0F1E",
-                    flexShrink: 0,
-                    boxShadow: "0 4px 12px rgba(212,168,67,0.2)",
-                  }}
-                >
-                  {getInitials(profile.full_name)}
-                </div>
-                <div>
-                  <h2 style={{ fontSize: 18, fontWeight: 800, color: "var(--text-primary)", marginBottom: 2 }}>
-                    {profile.full_name}
-                  </h2>
-                  <p style={{ fontSize: 13, color: "var(--gold)", marginBottom: 6, fontWeight: 600 }}>
-                    Age: {profile.age} · {profile.willing_to_relocate ? "Willing to relocate" : "Local only"}
-                  </p>
-                  <span
+                <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+                  {/* Avatar */}
+                  <div
                     style={{
-                      fontSize: 11, fontWeight: 600,
-                      color: "var(--success)",
-                      background: "rgba(74,222,128,0.08)",
-                      border: "1px solid rgba(74,222,128,0.2)",
-                      borderRadius: 100, padding: "3px 10px",
-                      display: "inline-flex", alignItems: "center", gap: 4
+                      width: 60, height: 60, borderRadius: "50%",
+                      background: "linear-gradient(135deg, #D4A843 0%, #B8922E 100%)",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      fontSize: 22, fontWeight: 800, color: "#0A0F1E",
+                      flexShrink: 0,
+                      boxShadow: "0 4px 12px rgba(212,168,67,0.2)",
                     }}
                   >
-                    <CheckCircle size={10} /> Profile Completed
-                  </span>
+                    {getInitials(profile.full_name)}
+                  </div>
+                  <div>
+                    <h2 style={{ fontSize: 18, fontWeight: 800, color: "var(--text-primary)", marginBottom: 2 }}>
+                      {profile.full_name}
+                    </h2>
+                    <p style={{ fontSize: 13, color: "var(--gold)", marginBottom: 6, fontWeight: 600 }}>
+                      Age: {profile.age} · {profile.willing_to_relocate ? "Willing to relocate" : "Local only"}
+                    </p>
+                    <span
+                      style={{
+                        fontSize: 11, fontWeight: 600,
+                        color: "var(--success)",
+                        background: "rgba(74,222,128,0.08)",
+                        border: "1px solid rgba(74,222,128,0.2)",
+                        borderRadius: 100, padding: "3px 10px",
+                        display: "inline-flex", alignItems: "center", gap: 4
+                      }}
+                    >
+                      <CheckCircle size={10} /> Profile Completed
+                    </span>
+                  </div>
                 </div>
+
+                {/* Settings button */}
+                <motion.button
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => {
+                    if (typeof window !== "undefined" && (window as any).Telegram?.WebApp) {
+                      (window as any).Telegram.WebApp.showAlert("Settings options coming soon!");
+                    } else {
+                      alert("Settings options coming soon!");
+                    }
+                  }}
+                  style={{
+                    width: 38, height: 38, borderRadius: 12,
+                    background: "rgba(255,255,255,0.05)",
+                    border: "1px solid rgba(255,255,255,0.08)",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    cursor: "pointer",
+                    flexShrink: 0,
+                  }}
+                >
+                  <Settings size={18} color="var(--text-secondary)" />
+                </motion.button>
               </div>
 
               {/* Privacy Notice */}
