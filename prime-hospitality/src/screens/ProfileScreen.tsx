@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { motion, LazyMotion, domAnimation } from "framer-motion";
+import { motion, LazyMotion, domAnimation, AnimatePresence } from "framer-motion";
 import { User, Phone, MapPin, Briefcase, FileText, RefreshCw, CheckCircle, HelpCircle, ShieldCheck, Settings } from "lucide-react";
 import { fetchProfile as fetchProfileApi } from "@/lib/api";
 import { useTelegram } from "@/hooks/useTelegram";
@@ -26,6 +26,7 @@ export default function ProfileScreen() {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [privacyDismissed, setPrivacyDismissed] = useState(false);
 
   const fetchProfile = useCallback(async () => {
     setIsLoading(true);
@@ -218,29 +219,88 @@ export default function ProfileScreen() {
               </div>
 
               {/* Privacy Notice */}
-              <div
-                style={{
-                  background: "rgba(212,168,67,0.08)",
-                  border: "1px dashed rgba(212,168,67,0.3)",
-                  borderRadius: 16,
-                  padding: "14px 16px",
-                  display: "flex",
-                  alignItems: "flex-start",
-                  gap: 12,
-                }}
-              >
-                <div style={{ marginTop: 2, background: "rgba(212,168,67,0.15)", borderRadius: "50%", padding: 6, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                  <ShieldCheck size={18} color="var(--gold)" />
-                </div>
-                <div>
-                  <p style={{ fontSize: 14, fontWeight: 700, color: "var(--gold)", marginBottom: 4 }}>
-                    Only Visible to Employers
-                  </p>
-                  <p style={{ fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.4 }}>
-                    Your profile and contact info are strictly confidential. They are only viewable by verified companies, and never by other job seekers.
-                  </p>
-                </div>
-              </div>
+              <AnimatePresence mode="wait">
+                {privacyDismissed ? (
+                  /* Collapsed — just a small "i" button */
+                  <motion.div
+                    key="info-btn"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    transition={{ duration: 0.18 }}
+                    style={{ display: "flex", justifyContent: "flex-end" }}
+                  >
+                    <motion.button
+                      whileTap={{ scale: 0.88 }}
+                      onClick={() => setPrivacyDismissed(false)}
+                      title="Show privacy notice"
+                      style={{
+                        width: 28, height: 28,
+                        borderRadius: "50%",
+                        background: "rgba(212,168,67,0.12)",
+                        border: "1px solid rgba(212,168,67,0.35)",
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                        cursor: "pointer",
+                        flexShrink: 0,
+                      }}
+                    >
+                      <HelpCircle size={14} color="var(--gold)" />
+                    </motion.button>
+                  </motion.div>
+                ) : (
+                  /* Expanded — full notice with OK button */
+                  <motion.div
+                    key="privacy-box"
+                    initial={{ opacity: 0, y: -6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -6 }}
+                    transition={{ duration: 0.18 }}
+                    style={{
+                      background: "rgba(212,168,67,0.08)",
+                      border: "1px dashed rgba(212,168,67,0.3)",
+                      borderRadius: 16,
+                      padding: "14px 16px",
+                      display: "flex",
+                      alignItems: "flex-start",
+                      gap: 12,
+                    }}
+                  >
+                    <div style={{ marginTop: 2, background: "rgba(212,168,67,0.15)", borderRadius: "50%", padding: 6, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                      <ShieldCheck size={18} color="var(--gold)" />
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <p style={{ fontSize: 14, fontWeight: 700, color: "var(--gold)", marginBottom: 4 }}>
+                        Only Visible to Employers
+                      </p>
+                      <p style={{ fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.4 }}>
+                        Your profile and contact info are strictly confidential. They are only viewable by verified companies, and never by other job seekers.
+                      </p>
+                    </div>
+                    {/* OK button */}
+                    <motion.button
+                      whileTap={{ scale: 0.88 }}
+                      onClick={() => setPrivacyDismissed(true)}
+                      style={{
+                        flexShrink: 0,
+                        alignSelf: "center",
+                        height: 26,
+                        padding: "0 10px",
+                        borderRadius: 100,
+                        background: "rgba(212,168,67,0.18)",
+                        border: "1px solid rgba(212,168,67,0.45)",
+                        color: "var(--gold)",
+                        fontSize: 12,
+                        fontWeight: 700,
+                        cursor: "pointer",
+                        fontFamily: "inherit",
+                        letterSpacing: "0.03em",
+                      }}
+                    >
+                      OK
+                    </motion.button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
               {/* Details sections */}
               <div
