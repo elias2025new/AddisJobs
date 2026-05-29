@@ -128,7 +128,7 @@ export default function App() {
             boxShadow: "0 12px 24px rgba(0,0,0,0.7), 0 4px 8px rgba(0,0,0,0.5), inset 0 2px 2px rgba(255,255,255,0.15), inset 0 -2px 4px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(212,168,67,0.5)",
           }}
         >
-          <img src="/logo.png" alt="Prime Hospitality Logo" style={{ width: "100%", height: "100%", objectFit: "contain", padding: "8px" }} />
+          <img src="/logo.png" alt="Prime Hospitality Logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
         </motion.div>
         <p style={{ fontSize: 14, color: "var(--text-muted)", fontWeight: 500 }}>
           Loading Prime Hospitality…
