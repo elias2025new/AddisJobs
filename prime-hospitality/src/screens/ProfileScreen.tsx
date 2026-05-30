@@ -26,7 +26,7 @@ function getCompletionSections(profile: Profile): CompletionSection[] {
     {
       key: "contact",
       label: "Contact number not shared",
-      done: !!(profile.contact_shared),
+      done: !!(profile.contact_shared || profile.phone_number),
       weight: 20,
     },
     {
