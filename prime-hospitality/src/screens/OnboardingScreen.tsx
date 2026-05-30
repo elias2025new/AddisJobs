@@ -68,7 +68,7 @@ export default function OnboardingScreen({ onComplete }: { onComplete: () => voi
 
         {/* Back Button (Hide on Step 1 and 6) */}
         {state.step > 1 && state.step < 6 && (
-          <div style={{ position: "absolute", top: "calc(env(safe-area-inset-top, 0px) + 20px)", left: 20, zIndex: 50 }}>
+          <div style={{ position: "absolute", top: "max(72px, calc(env(safe-area-inset-top, 0px) + 32px))", left: 20, zIndex: 50 }}>
             <motion.button
               whileTap={{ scale: 0.9 }}
               onClick={() => goBack((state.step - 1) as OnboardingStep)}
@@ -120,7 +120,6 @@ const JOB_CATEGORIES_DATA = [
   { label: "Cashier", emoji: "💳" },
   { label: "Cook", emoji: "🍳" },
   { label: "Delivery", emoji: "🛵" },
-  { label: "Cleaner", emoji: "🧽" },
   { label: "Driver", emoji: "🚗" },
   { label: "Marketing & Sales", emoji: "📈" },
   { label: "F&B", emoji: "🍹" },
@@ -128,14 +127,18 @@ const JOB_CATEGORIES_DATA = [
   { label: "Cost Control", emoji: "📊" },
   { label: "Accountant", emoji: "🧮" },
   { label: "Bellboy", emoji: "🧳" },
-  { label: "Store Keeper", emoji: "📦" },
   { label: "Phone Operator", emoji: "📞" },
   { label: "Maintenance", emoji: "🔧" },
+  { label: "IT Officer", emoji: "💻" },
+  { label: "Spa Attendant", emoji: "💆" },
+  { label: "Gym Trainer", emoji: "🏋️" },
+  { label: "Banquet", emoji: "🥂" },
   { label: "Other", emoji: "✨" },
 ];
 
 function Step1_JobField({ state, updateState, onNext }: StepProps) {
   const [shakeId, setShakeId] = useState<string | null>(null);
+  const [otherValue, setOtherValue] = useState("");
 
   const toggleCategory = (label: string) => {
     const isSelected = state.selectedCategories.includes(label);
@@ -152,7 +155,7 @@ function Step1_JobField({ state, updateState, onNext }: StepProps) {
   };
 
   return (
-    <div style={{ padding: "80px 20px 40px", flex: 1, display: "flex", flexDirection: "column" }}>
+    <div style={{ padding: "130px 20px 40px", flex: 1, display: "flex", flexDirection: "column" }}>
       <h1 style={{ fontSize: 28, fontWeight: 800, color: "var(--text-primary)", marginBottom: 8, lineHeight: 1.2 }}>
         What type of work are you looking for?
       </h1>
@@ -218,12 +221,36 @@ function Step1_JobField({ state, updateState, onNext }: StepProps) {
         </motion.p>
       )}
 
+      {state.selectedCategories.includes("Other") && (
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: "auto" }}
+          style={{ marginTop: 16 }}
+        >
+          <p style={{ fontSize: 13, fontWeight: 600, color: "var(--text-muted)", marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+            Please Specify
+          </p>
+          <input
+            className="input-base"
+            placeholder="e.g. Musician"
+            value={otherValue}
+            onChange={(e) => setOtherValue(e.target.value)}
+          />
+        </motion.div>
+      )}
+
       {state.selectedCategories.length > 0 && (
         <motion.button
           initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
           className="btn-primary"
           style={{ marginTop: 24 }}
-          onClick={onNext}
+          onClick={() => {
+            if (state.selectedCategories.includes("Other") && otherValue.trim()) {
+              const updated = state.selectedCategories.map(c => c === "Other" ? otherValue.trim() : c);
+              updateState({ selectedCategories: updated });
+            }
+            onNext();
+          }}
         >
           Continue
         </motion.button>
@@ -270,7 +297,7 @@ function Step2_Contact({ state, updateState, onNext }: StepProps) {
   };
 
   return (
-    <div style={{ padding: "120px 20px 40px", flex: 1, display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
+    <div style={{ padding: "130px 20px 40px", flex: 1, display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
       <div style={{ width: 80, height: 80, borderRadius: "50%", background: "rgba(5,150,105,0.1)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 24 }}>
         <Smartphone size={36} color="var(--brand)" />
       </div>
@@ -333,7 +360,7 @@ function Step3_Experience({ state, updateState, onNext }: StepProps) {
   const allSelected = state.selectedCategories.every(cat => state.experienceLevels[cat]);
 
   return (
-    <div style={{ padding: "80px 20px 40px", flex: 1, display: "flex", flexDirection: "column" }}>
+    <div style={{ padding: "130px 20px 40px", flex: 1, display: "flex", flexDirection: "column" }}>
       <h1 style={{ fontSize: 26, fontWeight: 800, color: "var(--text-primary)", marginBottom: 8, lineHeight: 1.2 }}>
         What is your experience level?
       </h1>
@@ -407,7 +434,7 @@ function Step4_Personal({ state, updateState, onNext }: StepProps) {
   const canProceed = state.fullName.length > 2 && state.age !== "" && state.age >= 16 && state.age <= 60 && state.location !== "" && state.gender !== "";
 
   return (
-    <div style={{ padding: "80px 20px 40px", flex: 1, display: "flex", flexDirection: "column" }}>
+    <div style={{ padding: "130px 20px 40px", flex: 1, display: "flex", flexDirection: "column" }}>
       <h1 style={{ fontSize: 26, fontWeight: 800, color: "var(--text-primary)", marginBottom: 32, lineHeight: 1.2 }}>
         Tell us a bit about yourself
       </h1>
@@ -526,7 +553,7 @@ function Step5_CV({ state, updateState, onNext }: StepProps) {
   };
 
   return (
-    <div style={{ padding: "80px 20px 40px", flex: 1, display: "flex", flexDirection: "column" }}>
+    <div style={{ padding: "130px 20px 40px", flex: 1, display: "flex", flexDirection: "column" }}>
       <h1 style={{ fontSize: 26, fontWeight: 800, color: "var(--text-primary)", marginBottom: 8, lineHeight: 1.2 }}>
         Upload your CV
       </h1>
