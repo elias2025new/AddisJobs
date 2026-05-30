@@ -10,9 +10,8 @@ import { useTelegram } from "@/hooks/useTelegram";
 interface CompletionSection {
   key: string;
   label: string;
-  description: string;
   done: boolean;
-  weight: number; // points out of 100
+  weight: number;
 }
 
 function getCompletionSections(profile: Profile): CompletionSection[] {
