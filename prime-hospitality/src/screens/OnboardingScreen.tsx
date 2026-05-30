@@ -198,7 +198,7 @@ function Step1_JobField({ state, updateState, onNext }: StepProps) {
                     fontSize: 11,
                     fontWeight: 800,
                     background: "var(--brand)",
-                    color: "var(--navy)",
+                    color: "#FFFFFF",
                     borderRadius: "50%",
                     width: 18,
                     height: 18,
@@ -512,7 +512,7 @@ function Step4_Personal({ state, updateState, onNext }: StepProps) {
           <motion.button
             whileTap={{ scale: 0.9 }}
             onClick={() => updateState({ willingToRelocate: !state.willingToRelocate })}
-            style={{ width: 48, height: 28, borderRadius: 100, background: state.willingToRelocate ? "var(--brand)" : "rgba(255,255,255,0.1)", border: "none", cursor: "pointer", position: "relative" }}
+            style={{ width: 48, height: 28, borderRadius: 100, background: state.willingToRelocate ? "var(--brand)" : "var(--text-muted)", border: "none", cursor: "pointer", position: "relative" }}
           >
             <motion.div
               animate={{ x: state.willingToRelocate ? 20 : 2 }}
