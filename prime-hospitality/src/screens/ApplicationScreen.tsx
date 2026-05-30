@@ -66,7 +66,7 @@ export default function ApplicationScreen({ job, profile, onBack, onSubmit }: Ap
           display: "flex",
           flexDirection: "column",
           height: "100dvh",
-          background: "var(--navy)",
+          background: "transparent",
           willChange: "transform",
           overflowY: "auto",
           overscrollBehavior: "contain",

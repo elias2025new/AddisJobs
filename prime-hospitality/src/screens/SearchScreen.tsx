@@ -106,7 +106,7 @@ export default function SearchScreen({ onJobSelect }: SearchScreenProps) {
           display: "flex",
           flexDirection: "column",
           height: "100dvh",
-          background: "var(--navy)",
+          background: "transparent",
           overflow: "hidden",
         }}
       >

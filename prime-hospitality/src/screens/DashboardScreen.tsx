@@ -154,7 +154,7 @@ export default function DashboardScreen() {
           display: "flex",
           flexDirection: "column",
           height: "100dvh",
-          background: "var(--navy)",
+          background: "transparent",
           overflowY: "auto",
           paddingBottom: 96,
         }}

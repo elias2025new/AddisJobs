@@ -52,7 +52,7 @@ export default function OnboardingScreen({ onComplete }: { onComplete: () => voi
 
   return (
     <LazyMotion features={domAnimation}>
-      <div style={{ position: "relative", width: "100%", height: "100dvh", background: "var(--navy)", overflow: "hidden", display: "flex", flexDirection: "column" }}>
+      <div style={{ position: "relative", width: "100%", height: "100dvh", background: "transparent", overflow: "hidden", display: "flex", flexDirection: "column" }}>
         
         {/* Progress Bar (Hide on Step 6) */}
         {state.step < 6 && (

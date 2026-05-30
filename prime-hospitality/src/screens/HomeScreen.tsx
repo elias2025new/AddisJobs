@@ -42,7 +42,7 @@ export default function HomeScreen({ onJobSelect, onSearchPress, profileName }: 
           display: "flex",
           flexDirection: "column",
           height: "100dvh",
-          background: "var(--navy)",
+          background: "transparent",
           overflow: "hidden",
         }}
       >

@@ -114,7 +114,7 @@ export default function App() {
           alignItems: "center",
           justifyContent: "center",
           height: "100dvh",
-          background: "var(--navy)",
+          background: "transparent",
           flexDirection: "column",
           gap: 16,
         }}
@@ -238,7 +238,7 @@ export default function App() {
           maxWidth: 480,
           margin: "0 auto",
           minHeight: "100dvh",
-          background: "var(--navy)",
+          background: "transparent",
           overflow: "hidden",
         }}
       >

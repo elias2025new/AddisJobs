@@ -31,7 +31,7 @@ export default function JobDetailScreen({ job, onBack, onApply }: JobDetailScree
           display: "flex",
           flexDirection: "column",
           height: "100dvh",
-          background: "var(--navy)",
+          background: "transparent",
           willChange: "transform",
           overflowY: "auto",
           overscrollBehavior: "contain",

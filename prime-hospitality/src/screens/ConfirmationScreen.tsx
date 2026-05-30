@@ -36,7 +36,7 @@ export default function ConfirmationScreen({ businessName, jobTitle, onBrowseMor
           alignItems: "center",
           justifyContent: "center",
           minHeight: "100dvh",
-          background: "var(--navy)",
+          background: "transparent",
           padding: "40px 32px",
           textAlign: "center",
           position: "relative",

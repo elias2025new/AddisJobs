@@ -142,7 +142,7 @@ export default function ProfileCheckScreen({ job, onBack, onProceed }: ProfileCh
           alignItems: "center",
           justifyContent: "center",
           height: "100dvh",
-          background: "var(--navy)",
+          background: "transparent",
           flexDirection: "column",
           gap: 16,
         }}
@@ -176,7 +176,7 @@ export default function ProfileCheckScreen({ job, onBack, onProceed }: ProfileCh
           display: "flex",
           flexDirection: "column",
           height: "100dvh",
-          background: "var(--navy)",
+          background: "transparent",
           willChange: "transform",
           overflowY: "auto",
           overscrollBehavior: "contain",

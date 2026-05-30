@@ -204,7 +204,7 @@ export default function ProfileScreen() {
           display: "flex",
           flexDirection: "column",
           height: "100dvh",
-          background: "var(--navy)",
+          background: "transparent",
           overflowY: "auto",
           paddingBottom: 96,
         }}
