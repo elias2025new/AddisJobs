@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, LazyMotion, domAnimation, AnimatePresence } from "framer-motion";
-import { Phone, MapPin, Briefcase, FileText, RefreshCw, CheckCircle, HelpCircle, ShieldCheck, Settings, AlertCircle, Upload, Loader2 } from "lucide-react";
+import { Phone, MapPin, Briefcase, FileText, RefreshCw, CheckCircle, HelpCircle, ShieldCheck, Settings, AlertCircle, Upload, Loader2, Moon, Sun, X } from "lucide-react";
 import { fetchProfile as fetchProfileApi, updateCv } from "@/lib/api";
 import { useTelegram } from "@/hooks/useTelegram";
 import { supabase } from "@/lib/supabase";
@@ -79,6 +79,20 @@ export default function ProfileScreen() {
   const [privacyDismissed, setPrivacyDismissed] = useState<boolean>(() => {
     try { return localStorage.getItem("profile_privacy_dismissed") === "true"; } catch { return false; }
   });
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [isDark, setIsDark] = useState<boolean>(() => {
+    try { return localStorage.getItem("theme") === "dark"; } catch { return false; }
+  });
+
+  const applyTheme = (dark: boolean) => {
+    setIsDark(dark);
+    try { localStorage.setItem("theme", dark ? "dark" : "light"); } catch {}
+    if (dark) {
+      document.documentElement.setAttribute("data-theme", "dark");
+    } else {
+      document.documentElement.removeAttribute("data-theme");
+    }
+  };
 
   const dismissPrivacy = () => {
     setPrivacyDismissed(true);
@@ -354,13 +368,7 @@ export default function ProfileScreen() {
                       {/* Settings button */}
                       <motion.button
                         whileTap={{ scale: 0.9 }}
-                        onClick={() => {
-                          if (typeof window !== "undefined" && (window as any).Telegram?.WebApp) {
-                            (window as any).Telegram.WebApp.showAlert("Settings options coming soon!");
-                          } else {
-                            alert("Settings options coming soon!");
-                          }
-                        }}
+                        onClick={() => setSettingsOpen(true)}
                         style={{
                           width: 38, height: 38, borderRadius: 12,
                           background: "var(--surface-elevated)",
@@ -676,6 +684,147 @@ export default function ProfileScreen() {
           style={{ display: "none" }}
         />
       </div>
+
+      {/* ── Settings Bottom Sheet ── */}
+      <AnimatePresence>
+        {settingsOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              key="settings-backdrop"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              onClick={() => setSettingsOpen(false)}
+              style={{
+                position: "fixed", inset: 0, zIndex: 100,
+                background: "rgba(0,0,0,0.5)",
+                backdropFilter: "blur(4px)",
+              }}
+            />
+
+            {/* Sheet */}
+            <motion.div
+              key="settings-sheet"
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{ type: "spring", stiffness: 320, damping: 32 }}
+              style={{
+                position: "fixed", bottom: 0, left: 0, right: 0,
+                zIndex: 101,
+                background: "var(--surface)",
+                borderRadius: "24px 24px 0 0",
+                padding: "0 0 env(safe-area-inset-bottom, 24px)",
+                boxShadow: "0 -8px 40px rgba(0,0,0,0.18)",
+                maxWidth: 480,
+                margin: "0 auto",
+              }}
+            >
+              {/* Handle bar */}
+              <div style={{
+                width: 40, height: 4, borderRadius: 100,
+                background: "var(--border)", margin: "12px auto 0",
+              }} />
+
+              {/* Header */}
+              <div style={{
+                display: "flex", alignItems: "center", justifyContent: "space-between",
+                padding: "16px 20px 8px",
+                borderBottom: "1px solid var(--border)",
+              }}>
+                <div>
+                  <p style={{ fontSize: 18, fontWeight: 800, color: "var(--text-primary)" }}>Settings</p>
+                  <p style={{ fontSize: 13, color: "var(--text-muted)", marginTop: 2 }}>Customize your experience</p>
+                </div>
+                <motion.button
+                  whileTap={{ scale: 0.88 }}
+                  onClick={() => setSettingsOpen(false)}
+                  style={{
+                    width: 34, height: 34, borderRadius: "50%",
+                    background: "var(--surface-elevated)",
+                    border: "1px solid var(--border)",
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    cursor: "pointer", flexShrink: 0,
+                  }}
+                >
+                  <X size={16} color="var(--text-secondary)" />
+                </motion.button>
+              </div>
+
+              {/* Settings options */}
+              <div style={{ padding: "16px 20px", display: "flex", flexDirection: "column", gap: 8 }}>
+
+                {/* Appearance section label */}
+                <p style={{
+                  fontSize: 11, fontWeight: 700, color: "var(--text-muted)",
+                  textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 4,
+                }}>
+                  Appearance
+                </p>
+
+                {/* Dark / Light toggle row */}
+                <div style={{
+                  display: "flex", alignItems: "center", justifyContent: "space-between",
+                  background: "var(--surface-elevated)",
+                  border: "1px solid var(--border)",
+                  borderRadius: 16, padding: "14px 16px",
+                }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                    {/* Icon that switches with theme */}
+                    <div style={{
+                      width: 38, height: 38, borderRadius: 12,
+                      background: isDark ? "rgba(99,102,241,0.12)" : "rgba(245,158,11,0.12)",
+                      border: `1px solid ${isDark ? "rgba(99,102,241,0.25)" : "rgba(245,158,11,0.25)"}`,
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      flexShrink: 0,
+                    }}>
+                      {isDark
+                        ? <Moon size={18} color="#818CF8" />
+                        : <Sun size={18} color="#F59E0B" />
+                      }
+                    </div>
+                    <div>
+                      <p style={{ fontSize: 14, fontWeight: 700, color: "var(--text-primary)" }}>
+                        {isDark ? "Dark Mode" : "Light Mode"}
+                      </p>
+                      <p style={{ fontSize: 12, color: "var(--text-muted)" }}>
+                        {isDark ? "Easy on the eyes at night" : "Bright and clear display"}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Toggle switch */}
+                  <motion.button
+                    onClick={() => applyTheme(!isDark)}
+                    style={{
+                      width: 50, height: 28, borderRadius: 100,
+                      background: isDark ? "var(--brand)" : "var(--surface)",
+                      border: `1.5px solid ${isDark ? "var(--brand)" : "var(--border)"}`,
+                      position: "relative", cursor: "pointer", flexShrink: 0,
+                      transition: "background 0.25s ease, border-color 0.25s ease",
+                    }}
+                  >
+                    <motion.div
+                      layout
+                      animate={{ x: isDark ? 22 : 2 }}
+                      transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                      style={{
+                        position: "absolute", top: 3,
+                        width: 20, height: 20, borderRadius: "50%",
+                        background: isDark ? "#fff" : "var(--text-muted)",
+                        boxShadow: "0 1px 4px rgba(0,0,0,0.2)",
+                      }}
+                    />
+                  </motion.button>
+                </div>
+
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </LazyMotion>
   );
 }
