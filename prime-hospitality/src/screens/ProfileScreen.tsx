@@ -92,6 +92,10 @@ export default function ProfileScreen() {
     } else {
       document.documentElement.removeAttribute("data-theme");
     }
+    // Notify the useTelegram hook to update native chrome bars
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new Event("themeToggle"));
+    }
   };
 
   const dismissPrivacy = () => {

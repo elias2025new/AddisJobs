@@ -47,38 +47,40 @@ export function useTelegram(): UseTelegramReturn {
           // Enable closing confirmation to prevent accidental exits
           tgWebApp.enableClosingConfirmation?.();
           // ── Theme Syncing ──
-          // Read the native Telegram theme (light/dark)
-          const colorScheme = tgWebApp.colorScheme || "light";
+          // Helper to apply the current active theme
+          const applyActiveTheme = () => {
+            let activeScheme = tgWebApp.colorScheme || "light";
+            try {
+              const saved = localStorage.getItem("theme");
+              if (saved === "dark" || saved === "light") {
+                activeScheme = saved;
+              }
+            } catch (e) {}
+
+            if (activeScheme === "dark") {
+              document.documentElement.setAttribute("data-theme", "dark");
+            } else {
+              document.documentElement.removeAttribute("data-theme");
+            }
+
+            const bgPrimary = activeScheme === "dark" ? "#0F172A" : "#F9FAFB";
+            const surfaceColor = activeScheme === "dark" ? "#1E293B" : "#FFFFFF";
+            
+            tgWebApp.setHeaderColor?.(bgPrimary);
+            tgWebApp.setBackgroundColor?.(bgPrimary);
+            tgWebApp.setBottomBarColor?.(surfaceColor);
+          };
+
+          // Apply immediately on launch
+          applyActiveTheme();
+
+          // Re-evaluate if Telegram's native theme changes
+          tgWebApp.onEvent?.("themeChanged", applyActiveTheme);
           
-          // Apply to the root HTML element for our CSS variables
-          if (colorScheme === "dark") {
-            document.documentElement.setAttribute("data-theme", "dark");
-          } else {
-            document.documentElement.removeAttribute("data-theme");
+          // Add a custom event listener so our ProfileScreen toggle can notify this hook
+          if (typeof window !== "undefined") {
+            window.addEventListener("themeToggle", applyActiveTheme);
           }
-
-          // Match ALL Telegram chrome colors to our new dynamic backgrounds
-          const bgPrimary = colorScheme === "dark" ? "#0F172A" : "#F9FAFB";
-          const surfaceColor = colorScheme === "dark" ? "#1E293B" : "#FFFFFF";
-          
-          tgWebApp.setHeaderColor?.(bgPrimary);
-          tgWebApp.setBackgroundColor?.(bgPrimary);
-          tgWebApp.setBottomBarColor?.(surfaceColor);
-
-          // Add a listener in case they switch themes while the app is open
-          tgWebApp.onEvent?.("themeChanged", () => {
-             const newScheme = tgWebApp.colorScheme || "light";
-             if (newScheme === "dark") {
-               document.documentElement.setAttribute("data-theme", "dark");
-             } else {
-               document.documentElement.removeAttribute("data-theme");
-             }
-             const newBg = newScheme === "dark" ? "#0F172A" : "#F9FAFB";
-             const newSurface = newScheme === "dark" ? "#1E293B" : "#FFFFFF";
-             tgWebApp.setHeaderColor?.(newBg);
-             tgWebApp.setBackgroundColor?.(newBg);
-             tgWebApp.setBottomBarColor?.(newSurface);
-          });
 
           const tgUser = tgWebApp.initDataUnsafe.user;
           setUser({
