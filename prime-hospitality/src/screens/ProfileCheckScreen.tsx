@@ -152,8 +152,8 @@ export default function ProfileCheckScreen({ job, onBack, onProceed }: ProfileCh
           transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
           style={{
             width: 40, height: 40, borderRadius: 12,
-            border: "3px solid rgba(212,168,67,0.1)",
-            borderTopColor: "var(--gold)",
+            border: "3px solid rgba(5,150,105,0.1)",
+            borderTopColor: "var(--brand)",
           }}
         />
         <p style={{ fontSize: 13, color: "var(--text-muted)", fontWeight: 500 }}>
@@ -254,7 +254,7 @@ export default function ProfileCheckScreen({ job, onBack, onProceed }: ProfileCh
                 </h2>
                 <p style={{ fontSize: 14, color: "var(--text-secondary)", lineHeight: 1.6, maxWidth: 300, margin: "0 auto" }}>
                   This job asks for{" "}
-                  <strong style={{ color: "var(--gold)" }}>{job.requirements.experience}</strong>{" "}
+                  <strong style={{ color: "var(--brand)" }}>{job.requirements.experience}</strong>{" "}
                   experience. Your profile shows{" "}
                   <strong style={{ color: "var(--text-primary)" }}>{profile?.experienceLevel || "Entry Level"}</strong>.
                 </p>
@@ -330,12 +330,12 @@ export default function ProfileCheckScreen({ job, onBack, onProceed }: ProfileCh
               {/* Intro */}
               <div
                 style={{
-                  background: "rgba(212,168,67,0.06)", border: "1px solid rgba(212,168,67,0.12)",
+                  background: "rgba(5,150,105,0.06)", border: "1px solid rgba(5,150,105,0.12)",
                   borderRadius: 14, padding: "14px 16px", marginBottom: 24,
                   display: "flex", alignItems: "flex-start", gap: 10,
                 }}
               >
-                <CheckCircle size={16} color="var(--gold)" style={{ flexShrink: 0, marginTop: 2 }} />
+                <CheckCircle size={16} color="var(--brand)" style={{ flexShrink: 0, marginTop: 2 }} />
                 <p style={{ fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.5 }}>
                   Create a quick profile so employers can reach you. It takes less than 2 minutes.
                 </p>
@@ -436,9 +436,9 @@ export default function ProfileCheckScreen({ job, onBack, onProceed }: ProfileCh
                           style={{
                             padding: "7px 14px", borderRadius: 100,
                             fontSize: 13, fontWeight: 600, cursor: "pointer",
-                            background: active ? "rgba(212,168,67,0.15)" : "rgba(255,255,255,0.04)",
-                            border: active ? "1px solid rgba(212,168,67,0.3)" : "1px solid rgba(255,255,255,0.08)",
-                            color: active ? "var(--gold)" : "var(--text-secondary)",
+                            background: active ? "rgba(5,150,105,0.15)" : "rgba(255,255,255,0.04)",
+                            border: active ? "1px solid rgba(5,150,105,0.3)" : "1px solid rgba(255,255,255,0.08)",
+                            color: active ? "var(--brand)" : "var(--text-secondary)",
                             fontFamily: "inherit",
                           }}
                         >
@@ -487,7 +487,7 @@ export default function ProfileCheckScreen({ job, onBack, onProceed }: ProfileCh
                     onClick={() => updateForm("willingToRelocate", !form.willingToRelocate)}
                     style={{
                       width: 48, height: 28, borderRadius: 100,
-                      background: form.willingToRelocate ? "var(--gold)" : "rgba(255,255,255,0.1)",
+                      background: form.willingToRelocate ? "var(--brand)" : "rgba(255,255,255,0.1)",
                       border: "none", cursor: "pointer", position: "relative",
                       flexShrink: 0, transition: "background 0.2s",
                     }}
@@ -552,7 +552,7 @@ function FieldBlock({
   return (
     <div>
       <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
-        <span style={{ color: "var(--gold)" }}>{icon}</span>
+        <span style={{ color: "var(--brand)" }}>{icon}</span>
         <label style={{ fontSize: 12, fontWeight: 600, color: "var(--text-secondary)", textTransform: "uppercase", letterSpacing: "0.04em" }}>
           {label}
         </label>

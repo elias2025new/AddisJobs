@@ -116,6 +116,7 @@ export interface CreateProfileParams {
     age: number | "";
     location: string;
     willingToRelocate: boolean;
+    gender: string;
     contactShared: boolean | null;
     phoneNumber: string;
     selectedCategories: string[];
@@ -132,6 +133,24 @@ export async function createProfile({
   return callEdgeFunction(initData, {
     action: "create_profile",
     profileData,
+    cvUrl,
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Action: Update CV URL
+// ---------------------------------------------------------------------------
+export interface UpdateCvParams {
+  initData: string | null;
+  cvUrl: string | null;
+}
+
+export async function updateCv({
+  initData,
+  cvUrl,
+}: UpdateCvParams): Promise<{ success: boolean; message: string }> {
+  return callEdgeFunction(initData, {
+    action: "update_cv",
     cvUrl,
   });
 }

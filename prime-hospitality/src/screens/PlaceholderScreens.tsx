@@ -47,19 +47,19 @@ export function ApplicationsScreen() {
         transition={{ duration: 0.25 }}
         style={{
           background: "var(--card)",
-          border: "1px solid rgba(212,168,67,0.15)",
+          border: "1px solid rgba(5,150,105,0.15)",
           borderRadius: 16,
           padding: 16,
           marginBottom: 12,
         }}
       >
         <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
-          <div style={{ fontSize: 24, width: 44, height: 44, borderRadius: 12, background: "rgba(212,168,67,0.08)", border: "1px solid rgba(212,168,67,0.15)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+          <div style={{ fontSize: 24, width: 44, height: 44, borderRadius: 12, background: "rgba(5,150,105,0.08)", border: "1px solid rgba(5,150,105,0.15)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
             🏨
           </div>
           <div style={{ flex: 1 }}>
             <p style={{ fontSize: 15, fontWeight: 700, color: "var(--text-primary)", marginBottom: 2 }}>Senior Waiter</p>
-            <p style={{ fontSize: 13, color: "var(--gold)", marginBottom: 8 }}>Skylight Hotel</p>
+            <p style={{ fontSize: 13, color: "var(--brand)", marginBottom: 8 }}>Skylight Hotel</p>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <span className="badge badge-success">✓ Submitted</span>
               <span style={{ fontSize: 11, color: "var(--text-muted)", display: "flex", alignItems: "center", gap: 3 }}>
@@ -111,7 +111,7 @@ export function ProfileScreen() {
         transition={{ duration: 0.25 }}
         style={{
           background: "linear-gradient(135deg, var(--surface-elevated) 0%, var(--card) 100%)",
-          border: "1px solid rgba(212,168,67,0.15)",
+          border: "1px solid rgba(5,150,105,0.15)",
           borderRadius: 20,
           padding: 20,
           marginBottom: 20,
@@ -124,7 +124,7 @@ export function ProfileScreen() {
         <div
           style={{
             width: 60, height: 60, borderRadius: "50%",
-            background: "linear-gradient(135deg, #D4A843 0%, #B8922E 100%)",
+            background: "linear-gradient(135deg, #059669 0%, #047857 100%)",
             display: "flex", alignItems: "center", justifyContent: "center",
             fontSize: 24, fontWeight: 800, color: "#0A0F1E",
             flexShrink: 0,
@@ -136,7 +136,7 @@ export function ProfileScreen() {
           <h2 style={{ fontSize: 18, fontWeight: 800, color: "var(--text-primary)", marginBottom: 2 }}>
             Biruk Tadesse
           </h2>
-          <p style={{ fontSize: 13, color: "var(--gold)", marginBottom: 4 }}>Waiter · Mid Level</p>
+          <p style={{ fontSize: 13, color: "var(--brand)", marginBottom: 4 }}>Waiter · Mid Level</p>
           <span className="badge badge-success">✓ Profile Complete</span>
         </div>
       </motion.div>
@@ -181,20 +181,20 @@ export function DashboardScreen() {
       title="Employer Dashboard"
       subtitle="Post jobs & manage applicants"
       description="Your employer dashboard is being set up. You'll be able to post jobs, view applicant profiles, and manage your hiring pipeline here."
-      isGold
+      isBrand
     />
   );
 }
 
 // ── Generic placeholder ──
 function PlaceholderScreen({
-  emoji, title, subtitle, description, isGold = false,
+  emoji, title, subtitle, description, isBrand = false,
 }: {
   emoji: string;
   title: string;
   subtitle: string;
   description: string;
-  isGold?: boolean;
+  isBrand?: boolean;
 }) {
   return (
     <LazyMotion features={domAnimation}>
@@ -216,8 +216,8 @@ function PlaceholderScreen({
         <div
           style={{
             width: 80, height: 80, borderRadius: 24,
-            background: isGold ? "rgba(212,168,67,0.1)" : "rgba(255,255,255,0.04)",
-            border: isGold ? "1px solid rgba(212,168,67,0.2)" : "1px solid rgba(255,255,255,0.06)",
+            background: isBrand ? "rgba(5,150,105,0.1)" : "rgba(255,255,255,0.04)",
+            border: isBrand ? "1px solid rgba(5,150,105,0.2)" : "1px solid rgba(255,255,255,0.06)",
             display: "flex", alignItems: "center", justifyContent: "center",
             fontSize: 36, marginBottom: 20,
           }}
@@ -227,7 +227,7 @@ function PlaceholderScreen({
         <h2 style={{ fontSize: 22, fontWeight: 800, color: "var(--text-primary)", marginBottom: 6, letterSpacing: "-0.02em" }}>
           {title}
         </h2>
-        <p style={{ fontSize: 13, fontWeight: 600, color: isGold ? "var(--gold)" : "var(--text-muted)", marginBottom: 12 }}>
+        <p style={{ fontSize: 13, fontWeight: 600, color: isBrand ? "var(--brand)" : "var(--text-muted)", marginBottom: 12 }}>
           {subtitle}
         </p>
         <p style={{ fontSize: 14, color: "var(--text-secondary)", lineHeight: 1.6, maxWidth: 280 }}>

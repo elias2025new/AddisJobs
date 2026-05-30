@@ -166,7 +166,7 @@ export default function ApplicationsScreen() {
               <button
                 onClick={loadApplications}
                 style={{
-                  fontSize: 13, fontWeight: 600, color: "var(--gold)",
+                  fontSize: 13, fontWeight: 600, color: "var(--brand)",
                   background: "none", border: "none", cursor: "pointer",
                 }}
               >
@@ -229,8 +229,8 @@ export default function ApplicationsScreen() {
                         <div
                           style={{
                             width: 44, height: 44, borderRadius: 12,
-                            background: "rgba(212,168,67,0.08)",
-                            border: "1px solid rgba(212,168,67,0.15)",
+                            background: "rgba(5,150,105,0.08)",
+                            border: "1px solid rgba(5,150,105,0.15)",
                             display: "flex", alignItems: "center", justifyContent: "center",
                             fontSize: 20, flexShrink: 0,
                           }}
@@ -242,7 +242,7 @@ export default function ApplicationsScreen() {
                           <p style={{ fontSize: 15, fontWeight: 700, color: "var(--text-primary)", marginBottom: 2, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                             {job?.title ?? "Job"}
                           </p>
-                          <p style={{ fontSize: 13, color: "var(--gold)", marginBottom: 8, fontWeight: 600 }}>
+                          <p style={{ fontSize: 13, color: "var(--brand)", marginBottom: 8, fontWeight: 600 }}>
                             {emp?.business_name ?? "—"}
                           </p>
 

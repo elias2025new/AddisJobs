@@ -61,7 +61,7 @@ export default function OnboardingScreen({ onComplete }: { onComplete: () => voi
               initial={false}
               animate={{ width: `${(state.step / 5) * 100}%` }}
               transition={{ duration: 0.3 }}
-              style={{ height: "100%", background: "var(--gold)" }}
+              style={{ height: "100%", background: "var(--brand)" }}
             />
           </div>
         )}
@@ -183,7 +183,7 @@ function Step1_JobField({ state, updateState, onNext }: StepProps) {
               <span style={{
                 fontSize: 16,
                 fontWeight: isSelected ? 700 : 500,
-                color: isSelected ? "var(--gold)" : "var(--text-secondary)",
+                color: isSelected ? "var(--brand)" : "var(--text-secondary)",
                 transition: "color 0.2s, font-weight 0.2s",
                 display: "inline-flex",
                 alignItems: "center",
@@ -194,7 +194,7 @@ function Step1_JobField({ state, updateState, onNext }: StepProps) {
                     marginLeft: 6,
                     fontSize: 11,
                     fontWeight: 800,
-                    background: "var(--gold)",
+                    background: "var(--brand)",
                     color: "var(--navy)",
                     borderRadius: "50%",
                     width: 18,
@@ -271,8 +271,8 @@ function Step2_Contact({ state, updateState, onNext }: StepProps) {
 
   return (
     <div style={{ padding: "120px 20px 40px", flex: 1, display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
-      <div style={{ width: 80, height: 80, borderRadius: "50%", background: "rgba(212,168,67,0.1)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 24 }}>
-        <Smartphone size={36} color="var(--gold)" />
+      <div style={{ width: 80, height: 80, borderRadius: "50%", background: "rgba(5,150,105,0.1)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 24 }}>
+        <Smartphone size={36} color="var(--brand)" />
       </div>
       <h1 style={{ fontSize: 26, fontWeight: 800, color: "var(--text-primary)", marginBottom: 12, lineHeight: 1.2 }}>
         Can we share your contact with employers?
@@ -286,11 +286,11 @@ function Step2_Contact({ state, updateState, onNext }: StepProps) {
           whileTap={{ scale: 0.96 }}
           onClick={handleYes}
           style={{
-            padding: 20, borderRadius: 16, background: "var(--card)", border: "1px solid var(--gold)",
+            padding: 20, borderRadius: 16, background: "var(--card)", border: "1px solid var(--brand)",
             display: "flex", alignItems: "center", gap: 16, cursor: "pointer", textAlign: "left"
           }}
         >
-          <div style={{ width: 40, height: 40, borderRadius: "50%", background: "var(--gold)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ width: 40, height: 40, borderRadius: "50%", background: "var(--brand)", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <CheckCircle size={20} color="var(--navy)" />
           </div>
           <div>
@@ -342,7 +342,7 @@ function Step3_Experience({ state, updateState, onNext }: StepProps) {
       <div style={{ display: "flex", flexDirection: "column", gap: 24, marginBottom: "auto" }}>
         {state.selectedCategories.map(cat => (
           <div key={cat}>
-            <h3 style={{ fontSize: 16, fontWeight: 600, color: "var(--gold)", marginBottom: 12 }}>{cat} Experience</h3>
+            <h3 style={{ fontSize: 16, fontWeight: 600, color: "var(--brand)", marginBottom: 12 }}>{cat} Experience</h3>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {EXPERIENCE_OPTIONS.map(level => {
                 const isSelected = state.experienceLevels[cat] === level;
@@ -353,9 +353,9 @@ function Step3_Experience({ state, updateState, onNext }: StepProps) {
                     onClick={() => handleSelect(cat, level)}
                     style={{
                       padding: "14px 16px", borderRadius: 12,
-                      background: isSelected ? "rgba(212,168,67,0.15)" : "var(--card)",
-                      border: isSelected ? "1px solid var(--gold)" : "1px solid var(--border)",
-                      color: isSelected ? "var(--gold)" : "var(--text-primary)",
+                      background: isSelected ? "rgba(5,150,105,0.15)" : "var(--card)",
+                      border: isSelected ? "1px solid var(--brand)" : "1px solid var(--border)",
+                      color: isSelected ? "var(--brand)" : "var(--text-primary)",
                       fontWeight: isSelected ? 600 : 500,
                       textAlign: "left", fontSize: 15, cursor: "pointer"
                     }}
@@ -440,27 +440,27 @@ function Step4_Personal({ state, updateState, onNext }: StepProps) {
                     flex: 1, padding: "16px 12px", borderRadius: 16, cursor: "pointer",
                     fontFamily: "inherit", display: "flex", flexDirection: "column",
                     alignItems: "center", gap: 10,
-                    background: isSelected ? "rgba(212,168,67,0.12)" : "var(--card)",
-                    border: isSelected ? "1.5px solid var(--gold)" : "1px solid var(--border)",
+                    background: isSelected ? "rgba(5,150,105,0.12)" : "var(--card)",
+                    border: isSelected ? "1.5px solid var(--brand)" : "1px solid var(--border)",
                   }}
                 >
                   {/* SVG figure */}
                   {g === "male" ? (
                     <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
-                      <circle cx="20" cy="11" r="7" fill={isSelected ? "#D4A843" : "#8B9BBE"} />
-                      <path d="M8 38c0-6.627 5.373-12 12-12s12 5.373 12 12" stroke={isSelected ? "#D4A843" : "#8B9BBE"} strokeWidth="3" strokeLinecap="round" fill="none"/>
+                      <circle cx="20" cy="11" r="7" fill={isSelected ? "#059669" : "#8B9BBE"} />
+                      <path d="M8 38c0-6.627 5.373-12 12-12s12 5.373 12 12" stroke={isSelected ? "#059669" : "#8B9BBE"} strokeWidth="3" strokeLinecap="round" fill="none"/>
                     </svg>
                   ) : (
                     <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
-                      <circle cx="20" cy="11" r="7" fill={isSelected ? "#D4A843" : "#8B9BBE"} />
-                      <path d="M20 18v4M11 26c0-2.761 4.029-5 9-5s9 2.239 9 5" stroke={isSelected ? "#D4A843" : "#8B9BBE"} strokeWidth="2.5" strokeLinecap="round" fill="none"/>
-                      <path d="M13 32c0 0 1.5-4 7-4s7 4 7 4" stroke={isSelected ? "#D4A843" : "#8B9BBE"} strokeWidth="2.5" strokeLinecap="round" fill="none"/>
-                      <ellipse cx="20" cy="31" rx="7" ry="4" fill={isSelected ? "rgba(212,168,67,0.2)" : "rgba(139,155,190,0.15)"}/>
+                      <circle cx="20" cy="11" r="7" fill={isSelected ? "#059669" : "#8B9BBE"} />
+                      <path d="M20 18v4M11 26c0-2.761 4.029-5 9-5s9 2.239 9 5" stroke={isSelected ? "#059669" : "#8B9BBE"} strokeWidth="2.5" strokeLinecap="round" fill="none"/>
+                      <path d="M13 32c0 0 1.5-4 7-4s7 4 7 4" stroke={isSelected ? "#059669" : "#8B9BBE"} strokeWidth="2.5" strokeLinecap="round" fill="none"/>
+                      <ellipse cx="20" cy="31" rx="7" ry="4" fill={isSelected ? "rgba(5,150,105,0.2)" : "rgba(139,155,190,0.15)"}/>
                     </svg>
                   )}
                   <span style={{
                     fontSize: 14, fontWeight: 700,
-                    color: isSelected ? "var(--gold)" : "var(--text-secondary)",
+                    color: isSelected ? "var(--brand)" : "var(--text-secondary)",
                     textTransform: "capitalize",
                   }}>{g}</span>
                 </motion.button>
@@ -485,7 +485,7 @@ function Step4_Personal({ state, updateState, onNext }: StepProps) {
           <motion.button
             whileTap={{ scale: 0.9 }}
             onClick={() => updateState({ willingToRelocate: !state.willingToRelocate })}
-            style={{ width: 48, height: 28, borderRadius: 100, background: state.willingToRelocate ? "var(--gold)" : "rgba(255,255,255,0.1)", border: "none", cursor: "pointer", position: "relative" }}
+            style={{ width: 48, height: 28, borderRadius: 100, background: state.willingToRelocate ? "var(--brand)" : "rgba(255,255,255,0.1)", border: "none", cursor: "pointer", position: "relative" }}
           >
             <motion.div
               animate={{ x: state.willingToRelocate ? 20 : 2 }}
@@ -539,9 +539,9 @@ function Step5_CV({ state, updateState, onNext }: StepProps) {
           whileTap={{ scale: 0.98 }}
           onClick={() => fileInputRef.current?.click()}
           style={{
-            border: "2px dashed rgba(212,168,67,0.4)", borderRadius: 20, padding: 40,
+            border: "2px dashed rgba(5,150,105,0.4)", borderRadius: 20, padding: 40,
             display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-            background: "rgba(212,168,67,0.05)", cursor: "pointer", minHeight: 200
+            background: "rgba(5,150,105,0.05)", cursor: "pointer", minHeight: 200
           }}
         >
           {state.cvFile ? (
@@ -552,7 +552,7 @@ function Step5_CV({ state, updateState, onNext }: StepProps) {
             </>
           ) : (
             <>
-              <UploadCloud size={48} color="var(--gold)" style={{ marginBottom: 16 }} />
+              <UploadCloud size={48} color="var(--brand)" style={{ marginBottom: 16 }} />
               <p style={{ fontSize: 16, fontWeight: 600, color: "var(--text-primary)" }}>Tap to select file</p>
             </>
           )}
@@ -586,7 +586,7 @@ function Step6_Success({ state, onNext }: { state: ReturnType<typeof useOnboardi
     <div style={{ padding: "40px 20px", flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", textAlign: "center" }}>
       <motion.div
         initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 200, damping: 20 }}
-        style={{ width: 100, height: 100, borderRadius: "50%", background: "linear-gradient(135deg, var(--gold) 0%, var(--gold-dim) 100%)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 32 }}
+        style={{ width: 100, height: 100, borderRadius: "50%", background: "linear-gradient(135deg, var(--brand) 0%, var(--brand-dim) 100%)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 32 }}
       >
         <CheckCircle size={50} color="var(--navy)" />
       </motion.div>

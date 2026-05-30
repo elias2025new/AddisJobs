@@ -273,6 +273,7 @@ serve(async (req: Request) => {
         age: profileData.age,
         location: sanitizeHtml(profileData.location || ""),
         willing_to_relocate: profileData.willingToRelocate,
+        gender: sanitizeHtml(profileData.gender || ""),
         phone_number: phoneToSave,
         contact_shared: profileData.contactShared,
         selected_categories: profileData.selectedCategories,
@@ -291,6 +292,23 @@ serve(async (req: Request) => {
       }
 
       return new Response(JSON.stringify({ success: true, message: "Profile created." }), {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Action: Update CV
+    if (action === "update_cv") {
+      const { cvUrl } = payload;
+      
+      const { error: updateError } = await supabase
+        .from("profiles")
+        .update({ cv_url: cvUrl })
+        .eq("telegram_id", telegramId);
+
+      if (updateError) throw updateError;
+
+      return new Response(JSON.stringify({ success: true, message: "CV updated successfully." }), {
         status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });

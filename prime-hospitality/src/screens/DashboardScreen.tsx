@@ -219,7 +219,7 @@ export default function DashboardScreen() {
               <p style={{ color: "#FCA5A5", fontSize: 14, marginBottom: 12 }}>{error}</p>
               <button
                 onClick={fetchDashboard}
-                style={{ fontSize: 13, fontWeight: 600, color: "var(--gold)", background: "none", border: "none", cursor: "pointer" }}
+                style={{ fontSize: 13, fontWeight: 600, color: "var(--brand)", background: "none", border: "none", cursor: "pointer" }}
               >
                 Try again
               </button>
@@ -260,7 +260,7 @@ export default function DashboardScreen() {
               {/* Stat grid */}
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
                 {[
-                  { icon: <Briefcase size={20} color="var(--gold)" />, value: stats.totalJobs, label: "Total Listings" },
+                  { icon: <Briefcase size={20} color="var(--brand)" />, value: stats.totalJobs, label: "Total Listings" },
                   { icon: <CheckCircle size={20} color="#4ADE80" />, value: stats.activeJobs, label: "Active Jobs" },
                   { icon: <Users size={20} color="#60A5FA" />, value: stats.totalApplicants, label: "Total Applicants" },
                   { icon: <TrendingUp size={20} color="#F59E0B" />, value: stats.pendingReview, label: "Under Review" },
@@ -294,13 +294,13 @@ export default function DashboardScreen() {
                     width: "100%",
                     padding: "14px 20px",
                     borderRadius: 14,
-                    background: "linear-gradient(135deg, #D4A843 0%, #B8922E 100%)",
+                    background: "linear-gradient(135deg, #059669 0%, #047857 100%)",
                     border: "none",
                     cursor: "pointer",
                     display: "flex", alignItems: "center", justifyContent: "center", gap: 10,
                     color: "#0A0F1E", fontSize: 15, fontWeight: 700,
                     fontFamily: "inherit",
-                    boxShadow: "0 4px 16px rgba(212,168,67,0.25)",
+                    boxShadow: "0 4px 16px rgba(5,150,105,0.25)",
                   }}
                 >
                   <PlusCircle size={18} />
@@ -463,13 +463,13 @@ export default function DashboardScreen() {
                     transition={{ type: "spring", stiffness: 250, damping: 20 }}
                     style={{
                       width: 72, height: 72, borderRadius: "50%",
-                      background: "linear-gradient(135deg, rgba(212,168,67,0.2), rgba(212,168,67,0.05))",
-                      border: "2px solid rgba(212,168,67,0.4)",
+                      background: "linear-gradient(135deg, rgba(5,150,105,0.2), rgba(5,150,105,0.05))",
+                      border: "2px solid rgba(5,150,105,0.4)",
                       display: "flex", alignItems: "center", justifyContent: "center",
                       margin: "0 auto 20px",
                     }}
                   >
-                    <CheckCircle size={36} color="#D4A843" />
+                    <CheckCircle size={36} color="#059669" />
                   </motion.div>
                   <h3 style={{ fontSize: 20, fontWeight: 800, color: "var(--text-primary)", marginBottom: 8 }}>Job Submitted!</h3>
                   <p style={{ fontSize: 14, color: "var(--text-secondary)", lineHeight: 1.6 }}>
@@ -512,9 +512,9 @@ export default function DashboardScreen() {
                             style={{
                               flex: 1, padding: "10px 4px", borderRadius: 10, fontSize: 13,
                               fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
-                              background: active ? "rgba(212,168,67,0.15)" : "rgba(255,255,255,0.04)",
-                              border: active ? "1px solid rgba(212,168,67,0.4)" : "1px solid rgba(255,255,255,0.07)",
-                              color: active ? "var(--gold)" : "var(--text-secondary)",
+                              background: active ? "rgba(5,150,105,0.15)" : "rgba(255,255,255,0.04)",
+                              border: active ? "1px solid rgba(5,150,105,0.4)" : "1px solid rgba(255,255,255,0.07)",
+                              color: active ? "var(--brand)" : "var(--text-secondary)",
                             }}
                           >{t}</button>
                         );
@@ -555,9 +555,9 @@ export default function DashboardScreen() {
                             style={{
                               padding: "8px 14px", borderRadius: 100, fontSize: 13,
                               fontWeight: 600, cursor: "pointer", fontFamily: "inherit",
-                              background: active ? "rgba(212,168,67,0.15)" : "rgba(255,255,255,0.04)",
-                              border: active ? "1px solid rgba(212,168,67,0.4)" : "1px solid rgba(255,255,255,0.07)",
-                              color: active ? "var(--gold)" : "var(--text-secondary)",
+                              background: active ? "rgba(5,150,105,0.15)" : "rgba(255,255,255,0.04)",
+                              border: active ? "1px solid rgba(5,150,105,0.4)" : "1px solid rgba(255,255,255,0.07)",
+                              color: active ? "var(--brand)" : "var(--text-secondary)",
                             }}
                           >{lvl}</button>
                         );

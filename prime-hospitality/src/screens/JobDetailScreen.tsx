@@ -103,7 +103,7 @@ export default function JobDetailScreen({ job, onBack, onApply }: JobDetailScree
             transition={{ duration: 0.28, delay: 0.05 }}
             style={{
               background: "linear-gradient(135deg, var(--surface-elevated) 0%, var(--card) 100%)",
-              border: "1px solid rgba(212,168,67,0.15)",
+              border: "1px solid rgba(5,150,105,0.15)",
               borderRadius: 20,
               padding: 20,
               marginBottom: 16,
@@ -117,8 +117,8 @@ export default function JobDetailScreen({ job, onBack, onApply }: JobDetailScree
                 width: 64,
                 height: 64,
                 borderRadius: 16,
-                background: "linear-gradient(135deg, rgba(212,168,67,0.15) 0%, rgba(212,168,67,0.05) 100%)",
-                border: "1px solid rgba(212,168,67,0.2)",
+                background: "linear-gradient(135deg, rgba(5,150,105,0.15) 0%, rgba(5,150,105,0.05) 100%)",
+                border: "1px solid rgba(5,150,105,0.2)",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
@@ -141,7 +141,7 @@ export default function JobDetailScreen({ job, onBack, onApply }: JobDetailScree
               >
                 {job.title}
               </h2>
-              <p style={{ fontSize: 14, color: "var(--gold)", fontWeight: 600 }}>
+              <p style={{ fontSize: 14, color: "var(--brand)", fontWeight: 600 }}>
                 {job.businessName}
               </p>
               <p style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 2 }}>
@@ -173,7 +173,7 @@ export default function JobDetailScreen({ job, onBack, onApply }: JobDetailScree
                 }}
               >
                 <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
-                  <Icon size={13} color="var(--gold)" />
+                  <Icon size={13} color="var(--brand)" />
                   <span style={{ fontSize: 10, color: "var(--text-muted)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em" }}>
                     {label}
                   </span>

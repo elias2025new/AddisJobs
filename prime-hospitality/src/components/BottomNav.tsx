@@ -85,9 +85,9 @@ export default function BottomNav({ activeTab, onTabChange, isEmployer = false }
                   style={{
                     position: "absolute",
                     inset: 0,
-                    background: "rgba(212, 168, 67, 0.1)",
+                    background: "rgba(5, 150, 105, 0.1)",
                     borderRadius: 12,
-                    border: "1px solid rgba(212, 168, 67, 0.2)",
+                    border: "1px solid rgba(5, 150, 105, 0.2)",
                   }}
                   transition={{ type: "spring", stiffness: 400, damping: 35 }}
                 />
@@ -95,7 +95,7 @@ export default function BottomNav({ activeTab, onTabChange, isEmployer = false }
 
               <motion.div
                 animate={{
-                  color: isActive ? "#D4A843" : "#4A5878",
+                  color: isActive ? "#059669" : "#4A5878",
                   scale: isActive ? 1.1 : 1,
                 }}
                 transition={{ duration: 0.2 }}
@@ -106,7 +106,7 @@ export default function BottomNav({ activeTab, onTabChange, isEmployer = false }
 
               <motion.span
                 animate={{
-                  color: isActive ? "#D4A843" : "#4A5878",
+                  color: isActive ? "#059669" : "#4A5878",
                   fontWeight: isActive ? 700 : 500,
                 }}
                 transition={{ duration: 0.2 }}

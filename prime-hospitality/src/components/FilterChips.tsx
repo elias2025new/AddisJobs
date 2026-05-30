@@ -72,7 +72,7 @@ export default function FilterChips({ selected, onSelect }: FilterChipsProps) {
             style={{ willChange: "transform", flexShrink: 0 }}
             animate={{
               background: isActive
-                ? "linear-gradient(135deg, #D4A843 0%, #B8922E 100%)"
+                ? "linear-gradient(135deg, #059669 0%, #047857 100%)"
                 : "rgba(255, 255, 255, 0.05)",
               borderColor: isActive
                 ? "transparent"

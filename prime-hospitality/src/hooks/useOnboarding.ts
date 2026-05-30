@@ -101,6 +101,7 @@ export function useOnboarding() {
           age: state.age,
           location: state.location,
           willingToRelocate: state.willingToRelocate,
+          gender: state.gender,
           contactShared: state.contactShared,
           phoneNumber: state.phoneNumber,
           selectedCategories: state.selectedCategories,

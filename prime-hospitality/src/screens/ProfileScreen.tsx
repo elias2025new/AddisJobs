@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, LazyMotion, domAnimation, AnimatePresence } from "framer-motion";
-import { Phone, MapPin, Briefcase, FileText, RefreshCw, CheckCircle, HelpCircle, ShieldCheck, Settings, AlertCircle } from "lucide-react";
-import { fetchProfile as fetchProfileApi } from "@/lib/api";
+import { Phone, MapPin, Briefcase, FileText, RefreshCw, CheckCircle, HelpCircle, ShieldCheck, Settings, AlertCircle, Upload, Loader2 } from "lucide-react";
+import { fetchProfile as fetchProfileApi, updateCv } from "@/lib/api";
 import { useTelegram } from "@/hooks/useTelegram";
+import { supabase } from "@/lib/supabase";
 
 // ── Profile completion helpers ──────────────────────────────────────────────
 interface CompletionSection {
@@ -59,6 +60,7 @@ interface Profile {
   telegram_id: number;
   full_name: string;
   age: number;
+  gender: "male" | "female" | string | null;
   location: string;
   willing_to_relocate: boolean;
   phone_number: string | null;
@@ -66,7 +68,6 @@ interface Profile {
   selected_categories: string[];
   experience_levels: Record<string, string>;
   cv_url: string | null;
-  gender: "male" | "female" | null;
   created_at: string;
 }
 
@@ -117,6 +118,76 @@ export default function ProfileScreen() {
   useEffect(() => {
     fetchProfile();
   }, [fetchProfile]);
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isUploadingCv, setIsUploadingCv] = useState(false);
+  const [cvUploadError, setCvUploadError] = useState<string | null>(null);
+
+  const triggerCvUpload = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const file = e.target.files[0];
+      if (file.size > 5 * 1024 * 1024) {
+        alert("File is too large. Max 5MB.");
+        return;
+      }
+      if (!file.name.endsWith(".pdf") && !file.name.endsWith(".doc") && !file.name.endsWith(".docx")) {
+        alert("Please upload a PDF or Word document.");
+        return;
+      }
+
+      setIsUploadingCv(true);
+      setCvUploadError(null);
+
+      try {
+        const telegramId = user?.id || Date.now();
+        const fileExt = file.name.split(".").pop();
+        const fileName = `${telegramId}-${Date.now()}.${fileExt}`;
+        const filePath = `cvs/${fileName}`;
+
+        console.log("[CV Upload] Uploading to resumes storage...");
+        const { error: uploadError } = await supabase.storage
+          .from("resumes")
+          .upload(filePath, file);
+
+        if (uploadError) {
+          throw new Error(uploadError.message);
+        }
+
+        const { data: publicUrlData } = supabase.storage
+          .from("resumes")
+          .getPublicUrl(filePath);
+
+        const cvUrl = publicUrlData.publicUrl;
+        console.log("[CV Upload] Success! Public URL:", cvUrl);
+
+        // Update profile in DB via Edge Function
+        await updateCv({ initData, cvUrl });
+
+        // Refresh profile state
+        await fetchProfile();
+        
+        if (typeof window !== "undefined" && (window as any).Telegram?.WebApp) {
+          (window as any).Telegram.WebApp.showAlert("CV uploaded successfully!");
+        } else {
+          alert("CV uploaded successfully!");
+        }
+      } catch (err: any) {
+        console.error("Error uploading CV:", err);
+        setCvUploadError(err.message || "Failed to upload CV");
+        if (typeof window !== "undefined" && (window as any).Telegram?.WebApp) {
+          (window as any).Telegram.WebApp.showAlert(err.message || "Failed to upload CV");
+        } else {
+          alert(err.message || "Failed to upload CV");
+        }
+      } finally {
+        setIsUploadingCv(false);
+      }
+    }
+  };
 
   const getInitials = (name: string) => {
     if (!name) return "U";
@@ -189,7 +260,7 @@ export default function ProfileScreen() {
               <button
                 onClick={fetchProfile}
                 style={{
-                  fontSize: 13, fontWeight: 600, color: "var(--gold)",
+                  fontSize: 13, fontWeight: 600, color: "var(--brand)",
                   background: "none", border: "none", cursor: "pointer",
                 }}
               >
@@ -217,7 +288,7 @@ export default function ProfileScreen() {
                     <div
                       style={{
                         background: "linear-gradient(135deg, var(--surface-elevated) 0%, var(--card) 100%)",
-                        border: "1px solid rgba(212,168,67,0.15)",
+                        border: "1px solid rgba(5,150,105,0.15)",
                         borderRadius: 20,
                         padding: 20,
                         display: "flex",
@@ -231,20 +302,34 @@ export default function ProfileScreen() {
                         <div
                           style={{
                             width: 60, height: 60, borderRadius: "50%",
-                            background: "linear-gradient(135deg, #D4A843 0%, #B8922E 100%)",
+                            background: "linear-gradient(135deg, #059669 0%, #047857 100%)",
                             display: "flex", alignItems: "center", justifyContent: "center",
                             fontSize: 22, fontWeight: 800, color: "#0A0F1E",
                             flexShrink: 0,
-                            boxShadow: "0 4px 12px rgba(212,168,67,0.2)",
+                            boxShadow: "0 4px 12px rgba(5,150,105,0.2)",
                           }}
                         >
-                          {getInitials(profile.full_name)}
+                          {profile.gender === "female" ? (
+                            <svg width="34" height="34" viewBox="0 0 40 40" fill="none">
+                              <circle cx="20" cy="11" r="7" fill="#0A0F1E" />
+                              <path d="M20 18v3M12 27c0-3.314 3.582-6 8-6s8 2.686 8 6" stroke="#0A0F1E" strokeWidth="2.5" strokeLinecap="round" fill="none"/>
+                              <path d="M14 33c0 0 1.5-4 6-4s6 4 6 4" stroke="#0A0F1E" strokeWidth="2.5" strokeLinecap="round" fill="none"/>
+                              <ellipse cx="20" cy="33" rx="6" ry="3.5" fill="rgba(10,15,30,0.25)"/>
+                            </svg>
+                          ) : profile.gender === "male" ? (
+                            <svg width="34" height="34" viewBox="0 0 40 40" fill="none">
+                              <circle cx="20" cy="11" r="7" fill="#0A0F1E" />
+                              <path d="M8 38c0-6.627 5.373-12 12-12s12 5.373 12 12" stroke="#0A0F1E" strokeWidth="3" strokeLinecap="round" fill="none"/>
+                            </svg>
+                          ) : (
+                            getInitials(profile.full_name)
+                          )}
                         </div>
                         <div>
                           <h2 style={{ fontSize: 18, fontWeight: 800, color: "var(--text-primary)", marginBottom: 2 }}>
                             {profile.full_name}
                           </h2>
-                          <p style={{ fontSize: 13, color: "var(--gold)", marginBottom: 6, fontWeight: 600 }}>
+                          <p style={{ fontSize: 13, color: "var(--brand)", marginBottom: 6, fontWeight: 600 }}>
                             Age: {profile.age} · {profile.willing_to_relocate ? "Willing to relocate" : "Local only"}
                           </p>
                           <span
@@ -304,7 +389,7 @@ export default function ProfileScreen() {
                         </span>
                         <span style={{
                           fontSize: 13, fontWeight: 800,
-                          color: isFullyDone ? "var(--success)" : "var(--gold)",
+                          color: isFullyDone ? "var(--success)" : "var(--brand)",
                         }}>
                           {score}%
                         </span>
@@ -321,7 +406,7 @@ export default function ProfileScreen() {
                             borderRadius: 100,
                             background: isFullyDone
                               ? "linear-gradient(90deg, #4ADE80 0%, #22C55E 100%)"
-                              : "linear-gradient(90deg, #D4A843 0%, #F59E0B 100%)",
+                              : "linear-gradient(90deg, #059669 0%, #F59E0B 100%)",
                           }}
                         />
                       </div>
@@ -334,38 +419,52 @@ export default function ProfileScreen() {
                         <p style={{ fontSize: 12, fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 2 }}>
                           Pending
                         </p>
-                        {incomplete.map((s) => (
-                          <motion.div
-                            key={s.key}
-                            initial={{ opacity: 0, x: -8 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            style={{
-                              background: "rgba(255,255,255,0.03)",
-                              border: "1px solid rgba(245,158,11,0.15)",
-                              borderRadius: 10,
-                              padding: "11px 14px",
-                              display: "flex",
-                              alignItems: "center",
-                              gap: 10,
-                            }}
-                          >
-                            <div style={{
-                              width: 6, height: 6, borderRadius: "50%",
-                              background: "#F59E0B",
-                              flexShrink: 0,
-                            }} />
-                            <p style={{ fontSize: 13, fontWeight: 500, color: "var(--text-secondary)", flex: 1 }}>
-                              {s.label}
-                            </p>
-                            <span style={{
-                              fontSize: 11, fontWeight: 700,
-                              color: "#F59E0B",
-                              flexShrink: 0,
-                            }}>
-                              +{s.weight}%
-                            </span>
-                          </motion.div>
-                        ))}
+                        {incomplete.map((s) => {
+                          const isCv = s.key === "cv";
+                          return (
+                            <motion.div
+                              key={s.key}
+                              initial={{ opacity: 0, x: -8 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              whileTap={isCv ? { scale: 0.98 } : undefined}
+                              onClick={isCv ? triggerCvUpload : undefined}
+                              style={{
+                                background: isCv ? "rgba(5,150,105,0.06)" : "rgba(255,255,255,0.03)",
+                                border: isCv ? "1px solid rgba(5,150,105,0.3)" : "1px solid rgba(245,158,11,0.15)",
+                                borderRadius: 10,
+                                padding: "11px 14px",
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 10,
+                                cursor: isCv ? "pointer" : "default",
+                                transition: "all 0.2s ease",
+                              }}
+                            >
+                              <div style={{
+                                width: 6, height: 6, borderRadius: "50%",
+                                background: isCv ? "var(--brand)" : "#F59E0B",
+                                flexShrink: 0,
+                              }} />
+                              <div style={{ flex: 1 }}>
+                                <p style={{ fontSize: 13, fontWeight: 500, color: "var(--text-secondary)" }}>
+                                  {s.label}
+                                </p>
+                                {isCv && (
+                                  <p style={{ fontSize: 11, color: "var(--brand)", fontWeight: 600, marginTop: 2 }}>
+                                    {isUploadingCv ? "Uploading CV..." : "Tap to upload CV"}
+                                  </p>
+                                )}
+                              </div>
+                              <span style={{
+                                fontSize: 11, fontWeight: 700,
+                                color: isCv ? "var(--brand)" : "#F59E0B",
+                                flexShrink: 0,
+                              }}>
+                                +{s.weight}%
+                              </span>
+                            </motion.div>
+                          );
+                        })}
                       </div>
                     )}
                   </>
@@ -391,14 +490,14 @@ export default function ProfileScreen() {
                       style={{
                         width: 28, height: 28,
                         borderRadius: "50%",
-                        background: "rgba(212,168,67,0.12)",
-                        border: "1px solid rgba(212,168,67,0.35)",
+                        background: "rgba(5,150,105,0.12)",
+                        border: "1px solid rgba(5,150,105,0.35)",
                         display: "flex", alignItems: "center", justifyContent: "center",
                         cursor: "pointer",
                         flexShrink: 0,
                       }}
                     >
-                      <HelpCircle size={14} color="var(--gold)" />
+                      <HelpCircle size={14} color="var(--brand)" />
                     </motion.button>
                   </motion.div>
                 ) : (
@@ -410,8 +509,8 @@ export default function ProfileScreen() {
                     exit={{ opacity: 0, y: -6 }}
                     transition={{ duration: 0.18 }}
                     style={{
-                      background: "rgba(212,168,67,0.08)",
-                      border: "1px dashed rgba(212,168,67,0.3)",
+                      background: "rgba(5,150,105,0.08)",
+                      border: "1px dashed rgba(5,150,105,0.3)",
                       borderRadius: 16,
                       padding: "14px 16px",
                       display: "flex",
@@ -419,11 +518,11 @@ export default function ProfileScreen() {
                       gap: 12,
                     }}
                   >
-                    <div style={{ marginTop: 2, background: "rgba(212,168,67,0.15)", borderRadius: "50%", padding: 6, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                      <ShieldCheck size={18} color="var(--gold)" />
+                    <div style={{ marginTop: 2, background: "rgba(5,150,105,0.15)", borderRadius: "50%", padding: 6, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                      <ShieldCheck size={18} color="var(--brand)" />
                     </div>
                     <div style={{ flex: 1 }}>
-                      <p style={{ fontSize: 14, fontWeight: 700, color: "var(--gold)", marginBottom: 4 }}>
+                      <p style={{ fontSize: 14, fontWeight: 700, color: "var(--brand)", marginBottom: 4 }}>
                         Only Visible to Employers
                       </p>
                       <p style={{ fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.4 }}>
@@ -440,9 +539,9 @@ export default function ProfileScreen() {
                         height: 26,
                         padding: "0 10px",
                         borderRadius: 100,
-                        background: "rgba(212,168,67,0.18)",
-                        border: "1px solid rgba(212,168,67,0.45)",
-                        color: "var(--gold)",
+                        background: "rgba(5,150,105,0.18)",
+                        border: "1px solid rgba(5,150,105,0.45)",
+                        color: "var(--brand)",
                         fontSize: 12,
                         fontWeight: 700,
                         cursor: "pointer",
@@ -474,7 +573,7 @@ export default function ProfileScreen() {
                   }}
                 >
                   <span style={{ fontSize: 13, color: "var(--text-muted)", fontWeight: 500, display: "flex", alignItems: "center", gap: 8 }}>
-                    <Phone size={14} color="var(--gold)" /> Phone
+                    <Phone size={14} color="var(--brand)" /> Phone
                   </span>
                   <span style={{ fontSize: 13, color: "var(--text-primary)", fontWeight: 600 }}>
                     {profile.phone_number ? profile.phone_number : (profile.contact_shared ? "Shared via Telegram" : "Not Shared")}
@@ -490,7 +589,7 @@ export default function ProfileScreen() {
                   }}
                 >
                   <span style={{ fontSize: 13, color: "var(--text-muted)", fontWeight: 500, display: "flex", alignItems: "center", gap: 8 }}>
-                    <MapPin size={14} color="var(--gold)" /> Location
+                    <MapPin size={14} color="var(--brand)" /> Location
                   </span>
                   <span style={{ fontSize: 13, color: "var(--text-primary)", fontWeight: 600 }}>
                     {profile.location}
@@ -507,7 +606,7 @@ export default function ProfileScreen() {
                   }}
                 >
                   <span style={{ fontSize: 13, color: "var(--text-muted)", fontWeight: 500, display: "flex", alignItems: "center", gap: 8 }}>
-                    <Briefcase size={14} color="var(--gold)" /> Roles & Experience
+                    <Briefcase size={14} color="var(--brand)" /> Roles & Experience
                   </span>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 8, paddingLeft: 22 }}>
                     {profile.selected_categories.map((cat) => {
@@ -525,7 +624,7 @@ export default function ProfileScreen() {
                           }}
                         >
                           <span style={{ fontWeight: 700 }}>{cat}</span>
-                          <span style={{ color: "var(--gold)", marginLeft: 6 }}>{exp}</span>
+                          <span style={{ color: "var(--brand)", marginLeft: 6 }}>{exp}</span>
                         </div>
                       );
                     })}
@@ -540,18 +639,28 @@ export default function ProfileScreen() {
                   }}
                 >
                   <span style={{ fontSize: 13, color: "var(--text-muted)", fontWeight: 500, display: "flex", alignItems: "center", gap: 8 }}>
-                    <FileText size={14} color="var(--gold)" /> Resume (CV)
+                    <FileText size={14} color="var(--brand)" /> Resume (CV)
                   </span>
                   <span style={{ fontSize: 13, color: "var(--text-primary)", fontWeight: 600, display: "flex", alignItems: "center", gap: 6 }}>
-                    {profile.cv_url ? (
+                    {isUploadingCv ? (
+                      <span style={{ color: "var(--brand)", display: "flex", alignItems: "center", gap: 4 }}>
+                        <Loader2 size={12} className="animate-spin" /> Uploading...
+                      </span>
+                    ) : profile.cv_url ? (
                       <>
                         <CheckCircle size={12} color="var(--success)" />
-                        <span style={{ textDecoration: "underline", color: "var(--gold)", cursor: "pointer" }} onClick={() => profile.cv_url && window.open(profile.cv_url, "_blank")}>
+                        <span style={{ textDecoration: "underline", color: "var(--brand)", cursor: "pointer" }} onClick={() => profile.cv_url && window.open(profile.cv_url, "_blank")}>
                           View CV
+                        </span>
+                        <span style={{ color: "var(--text-muted)", fontSize: 11, marginLeft: 2, marginRight: 2 }}>|</span>
+                        <span style={{ textDecoration: "underline", color: "var(--text-secondary)", cursor: "pointer" }} onClick={triggerCvUpload}>
+                          Change
                         </span>
                       </>
                     ) : (
-                      "No CV Uploaded"
+                      <span style={{ textDecoration: "underline", color: "var(--brand)", cursor: "pointer", display: "flex", alignItems: "center", gap: 4 }} onClick={triggerCvUpload}>
+                        <Upload size={12} /> Upload CV
+                      </span>
                     )}
                   </span>
                 </div>
@@ -559,6 +668,13 @@ export default function ProfileScreen() {
             </motion.div>
           )}
         </div>
+        <input
+          type="file"
+          ref={fileInputRef}
+          accept=".pdf,.doc,.docx"
+          onChange={handleFileChange}
+          style={{ display: "none" }}
+        />
       </div>
     </LazyMotion>
   );

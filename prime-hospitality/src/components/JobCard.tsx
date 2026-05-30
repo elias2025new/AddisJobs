@@ -100,8 +100,8 @@ const JobCard = memo(function JobCard({ job, onClick, index }: JobCardProps) {
               width: 48,
               height: 48,
               borderRadius: 12,
-              background: "rgba(212, 168, 67, 0.08)",
-              border: "1px solid rgba(212, 168, 67, 0.15)",
+              background: "rgba(5, 150, 105, 0.08)",
+              border: "1px solid rgba(5, 150, 105, 0.15)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -174,7 +174,7 @@ const JobCard = memo(function JobCard({ job, onClick, index }: JobCardProps) {
         {/* Tags row */}
         <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
           {/* Salary */}
-          <span className="badge badge-gold">
+          <span className="badge badge-brand">
             {formatSalary(job.salaryMin, job.salaryMax)}
           </span>
 

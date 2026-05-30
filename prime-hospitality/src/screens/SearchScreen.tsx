@@ -143,7 +143,7 @@ export default function SearchScreen({ onJobSelect }: SearchScreenProps) {
               marginBottom: 10,
             }}
           >
-            <Search size={18} color="var(--gold)" style={{ flexShrink: 0 }} />
+            <Search size={18} color="var(--brand)" style={{ flexShrink: 0 }} />
             <input
               ref={inputRef}
               type="text"
@@ -184,14 +184,14 @@ export default function SearchScreen({ onJobSelect }: SearchScreenProps) {
               onClick={() => setShowFilters((v) => !v)}
               style={{
                 width: 32, height: 32, borderRadius: 9,
-                background: showFilters ? "rgba(212,168,67,0.15)" : "rgba(255,255,255,0.05)",
-                border: showFilters ? "1px solid rgba(212,168,67,0.3)" : "1px solid rgba(255,255,255,0.07)",
+                background: showFilters ? "rgba(5,150,105,0.15)" : "rgba(255,255,255,0.05)",
+                border: showFilters ? "1px solid rgba(5,150,105,0.3)" : "1px solid rgba(255,255,255,0.07)",
                 cursor: "pointer",
                 display: "flex", alignItems: "center", justifyContent: "center",
                 flexShrink: 0,
               }}
             >
-              <SlidersHorizontal size={14} color={showFilters ? "var(--gold)" : "var(--text-secondary)"} />
+              <SlidersHorizontal size={14} color={showFilters ? "var(--brand)" : "var(--text-secondary)"} />
             </motion.button>
           </div>
 
@@ -224,9 +224,9 @@ export default function SearchScreen({ onJobSelect }: SearchScreenProps) {
                             borderRadius: 100,
                             fontSize: 13, fontWeight: 600,
                             cursor: "pointer",
-                            background: active ? "rgba(212,168,67,0.15)" : "rgba(255,255,255,0.04)",
-                            border: active ? "1px solid rgba(212,168,67,0.35)" : "1px solid rgba(255,255,255,0.07)",
-                            color: active ? "var(--gold)" : "var(--text-secondary)",
+                            background: active ? "rgba(5,150,105,0.15)" : "rgba(255,255,255,0.04)",
+                            border: active ? "1px solid rgba(5,150,105,0.35)" : "1px solid rgba(255,255,255,0.07)",
+                            color: active ? "var(--brand)" : "var(--text-secondary)",
                             transition: "all 0.15s ease",
                           }}
                         >
@@ -275,7 +275,7 @@ export default function SearchScreen({ onJobSelect }: SearchScreenProps) {
               <p style={{ color: "#FCA5A5", fontSize: 14, marginBottom: 12 }}>{error}</p>
               <button
                 onClick={() => doSearch(query, selectedCategory)}
-                style={{ fontSize: 13, fontWeight: 600, color: "var(--gold)", background: "none", border: "none", cursor: "pointer" }}
+                style={{ fontSize: 13, fontWeight: 600, color: "var(--brand)", background: "none", border: "none", cursor: "pointer" }}
               >
                 Try again
               </button>
@@ -292,8 +292,8 @@ export default function SearchScreen({ onJobSelect }: SearchScreenProps) {
               <div
                 style={{
                   width: 72, height: 72, borderRadius: 20,
-                  background: "rgba(212,168,67,0.06)",
-                  border: "1px solid rgba(212,168,67,0.12)",
+                  background: "rgba(5,150,105,0.06)",
+                  border: "1px solid rgba(5,150,105,0.12)",
                   display: "flex", alignItems: "center", justifyContent: "center",
                   margin: "0 auto 20px", fontSize: 32,
                 }}
@@ -368,8 +368,8 @@ export default function SearchScreen({ onJobSelect }: SearchScreenProps) {
                       <div
                         style={{
                           width: 46, height: 46, borderRadius: 13,
-                          background: "rgba(212,168,67,0.08)",
-                          border: "1px solid rgba(212,168,67,0.15)",
+                          background: "rgba(5,150,105,0.08)",
+                          border: "1px solid rgba(5,150,105,0.15)",
                           display: "flex", alignItems: "center", justifyContent: "center",
                           fontSize: 22, flexShrink: 0,
                         }}
@@ -381,7 +381,7 @@ export default function SearchScreen({ onJobSelect }: SearchScreenProps) {
                         <p style={{ fontSize: 15, fontWeight: 700, color: "var(--text-primary)", marginBottom: 2, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                           {job.title}
                         </p>
-                        <p style={{ fontSize: 13, color: "var(--gold)", marginBottom: 8, fontWeight: 600 }}>
+                        <p style={{ fontSize: 13, color: "var(--brand)", marginBottom: 8, fontWeight: 600 }}>
                           {job.businessName}
                         </p>
 

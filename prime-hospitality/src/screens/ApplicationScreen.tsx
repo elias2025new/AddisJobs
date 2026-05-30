@@ -118,8 +118,8 @@ export default function ApplicationScreen({ job, profile, onBack, onSubmit }: Ap
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.25, delay: 0.05 }}
             style={{
-              background: "rgba(212,168,67,0.06)",
-              border: "1px solid rgba(212,168,67,0.15)",
+              background: "rgba(5,150,105,0.06)",
+              border: "1px solid rgba(5,150,105,0.15)",
               borderRadius: 14, padding: "12px 16px",
               display: "flex", alignItems: "center", gap: 12, marginBottom: 24,
             }}
@@ -127,7 +127,7 @@ export default function ApplicationScreen({ job, profile, onBack, onSubmit }: Ap
             <div style={{ fontSize: 24 }}>{job.businessLogo}</div>
             <div>
               <p style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary)" }}>{job.title}</p>
-              <p style={{ fontSize: 12, color: "var(--gold)" }}>{job.businessName} · {job.neighborhood}</p>
+              <p style={{ fontSize: 12, color: "var(--brand)" }}>{job.businessName} · {job.neighborhood}</p>
             </div>
           </motion.div>
 
@@ -143,21 +143,21 @@ export default function ApplicationScreen({ job, profile, onBack, onSubmit }: Ap
 
               {/* Full name */}
               <PrefilledField
-                icon={<User size={14} color="var(--gold)" />}
+                icon={<User size={14} color="var(--brand)" />}
                 label="Full Name"
                 value={profile.fullName}
               />
 
               {/* Phone */}
               <PrefilledField
-                icon={<Phone size={14} color="var(--gold)" />}
+                icon={<Phone size={14} color="var(--brand)" />}
                 label="Phone Number"
                 value={profile.phone}
               />
 
               {/* Experience */}
               <PrefilledField
-                icon={<Briefcase size={14} color="var(--gold)" />}
+                icon={<Briefcase size={14} color="var(--brand)" />}
                 label="Experience Level"
                 value={profile.experienceLevel}
               />
@@ -171,7 +171,7 @@ export default function ApplicationScreen({ job, profile, onBack, onSubmit }: Ap
                   borderRadius: 12, padding: "12px 16px", gap: 10,
                 }}
               >
-                <MapPin size={14} color="var(--gold)" style={{ flexShrink: 0 }} />
+                <MapPin size={14} color="var(--brand)" style={{ flexShrink: 0 }} />
                 <div>
                   <p style={{ fontSize: 10, color: "var(--text-muted)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: 2 }}>
                     Location
