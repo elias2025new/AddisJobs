@@ -197,7 +197,7 @@ export default function ApplicationsScreen() {
                 No applications yet
               </h2>
               <p style={{ fontSize: 14, color: "var(--text-secondary)", lineHeight: 1.6, maxWidth: 260, margin: "0 auto" }}>
-                Browse jobs and hit Apply — your applications will track here in real time.
+                Find jobs and hit Apply — your applications will track here in real time.
               </p>
             </motion.div>
           )}

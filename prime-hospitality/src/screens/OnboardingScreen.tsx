@@ -406,7 +406,11 @@ function Step3_Experience({ state, updateState, onNext }: StepProps) {
 }
 
 // --- Step 4: Personal Details ---
-const ADDIS_NEIGHBORHOODS = ["Bole", "Kazanchis", "CMC", "Megenagna", "Sarbet", "Lebu", "Gerji", "Piassa", "Akaki", "Lideta", "Kirkos", "Kolfe", "Yeka", "Other"];
+const ADDIS_NEIGHBORHOODS = [
+  "Bole", "Kazanchis", "CMC", "Megenagna", "Sarbet", "Lebu", "Gerji", "Piassa", 
+  "Akaki", "Lideta", "Kirkos", "Kolfe", "Yeka", "Ayat", "Kality", "Gulele", 
+  "Addis Ketema", "Nifas Silk", "Jemo", "Kera", "Merkato", "Shiromeda", "Other"
+];
 
 function Step4_Personal({ state, updateState, onNext }: StepProps) {
   const [ageError, setAgeError] = useState("");
@@ -627,7 +631,7 @@ function Step6_Success({ state, onNext }: { state: ReturnType<typeof useOnboardi
       </motion.p>
 
       <motion.button initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="btn-primary" onClick={onNext} style={{ width: "100%" }}>
-        Browse Jobs
+        Find jobs
       </motion.button>
     </div>
   );
