@@ -56,8 +56,8 @@ export default function HomeScreen({ onJobSelect, onSearchPress, profileName }: 
             paddingLeft: 20,
             paddingRight: 20,
             paddingBottom: 16,
-            background:
-              "linear-gradient(180deg, rgba(10,15,30,1) 0%, rgba(10,15,30,0.95) 100%)",
+            background: "var(--app-bg)",
+            position: "relative",
             flexShrink: 0,
           }}
         >

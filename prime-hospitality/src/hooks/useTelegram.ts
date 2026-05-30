@@ -46,11 +46,39 @@ export function useTelegram(): UseTelegramReturn {
           tgWebApp.disableVerticalSwipes?.();
           // Enable closing confirmation to prevent accidental exits
           tgWebApp.enableClosingConfirmation?.();
-          // Match ALL Telegram chrome colors to our navy so no bar is visible
-          tgWebApp.setHeaderColor?.('#0A0F1E');
-          tgWebApp.setBackgroundColor?.('#0A0F1E');
-          // Hide the bottom system bar (Telegram 8.0+, silently ignored on older)
-          tgWebApp.setBottomBarColor?.('#0A0F1E');
+          // ── Theme Syncing ──
+          // Read the native Telegram theme (light/dark)
+          const colorScheme = tgWebApp.colorScheme || "light";
+          
+          // Apply to the root HTML element for our CSS variables
+          if (colorScheme === "dark") {
+            document.documentElement.setAttribute("data-theme", "dark");
+          } else {
+            document.documentElement.removeAttribute("data-theme");
+          }
+
+          // Match ALL Telegram chrome colors to our new dynamic backgrounds
+          const bgPrimary = colorScheme === "dark" ? "#0F172A" : "#F9FAFB";
+          const surfaceColor = colorScheme === "dark" ? "#1E293B" : "#FFFFFF";
+          
+          tgWebApp.setHeaderColor?.(bgPrimary);
+          tgWebApp.setBackgroundColor?.(bgPrimary);
+          tgWebApp.setBottomBarColor?.(surfaceColor);
+
+          // Add a listener in case they switch themes while the app is open
+          tgWebApp.onEvent?.("themeChanged", () => {
+             const newScheme = tgWebApp.colorScheme || "light";
+             if (newScheme === "dark") {
+               document.documentElement.setAttribute("data-theme", "dark");
+             } else {
+               document.documentElement.removeAttribute("data-theme");
+             }
+             const newBg = newScheme === "dark" ? "#0F172A" : "#F9FAFB";
+             const newSurface = newScheme === "dark" ? "#1E293B" : "#FFFFFF";
+             tgWebApp.setHeaderColor?.(newBg);
+             tgWebApp.setBackgroundColor?.(newBg);
+             tgWebApp.setBottomBarColor?.(newSurface);
+          });
 
           const tgUser = tgWebApp.initDataUnsafe.user;
           setUser({

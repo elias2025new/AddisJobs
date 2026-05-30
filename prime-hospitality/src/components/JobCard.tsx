@@ -46,16 +46,7 @@ const JobCard = memo(function JobCard({ job, onClick, index }: JobCardProps) {
     >
       {/* Dim overlay for unqualified jobs */}
       {isUnqualified && (
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            background: "rgba(10, 15, 30, 0.5)",
-            borderRadius: 16,
-            zIndex: 2,
-            pointerEvents: "none",
-          }}
-        />
+        <div className="qualification-dim" />
       )}
 
       {/* Unqualified badge */}
@@ -100,8 +91,8 @@ const JobCard = memo(function JobCard({ job, onClick, index }: JobCardProps) {
               width: 48,
               height: 48,
               borderRadius: 12,
-              background: "rgba(5, 150, 105, 0.08)",
-              border: "1px solid rgba(5, 150, 105, 0.15)",
+              background: "var(--brand-subtle)",
+              border: "1px solid var(--border)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",

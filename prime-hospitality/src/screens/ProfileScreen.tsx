@@ -225,8 +225,8 @@ export default function ProfileScreen() {
               onClick={fetchProfile}
               style={{
                 width: 38, height: 38, borderRadius: 12,
-                background: "rgba(255,255,255,0.05)",
-                border: "1px solid rgba(255,255,255,0.08)",
+                background: "var(--surface-elevated)",
+                border: "1px solid var(--border)",
                 display: "flex", alignItems: "center", justifyContent: "center",
                 cursor: "pointer",
               }}
@@ -363,8 +363,8 @@ export default function ProfileScreen() {
                         }}
                         style={{
                           width: 38, height: 38, borderRadius: 12,
-                          background: "rgba(255,255,255,0.05)",
-                          border: "1px solid rgba(255,255,255,0.08)",
+                          background: "var(--surface-elevated)",
+                          border: "1px solid var(--border)",
                           display: "flex", alignItems: "center", justifyContent: "center",
                           cursor: "pointer",
                           flexShrink: 0,
@@ -396,7 +396,7 @@ export default function ProfileScreen() {
                       </div>
 
                       {/* Track */}
-                      <div style={{ height: 8, background: "rgba(255,255,255,0.06)", borderRadius: 100, overflow: "hidden" }}>
+                      <div style={{ height: 8, background: "var(--surface-elevated)", borderRadius: 100, overflow: "hidden" }}>
                         <motion.div
                           initial={{ width: 0 }}
                           animate={{ width: `${score}%` }}
@@ -429,7 +429,7 @@ export default function ProfileScreen() {
                               whileTap={isCv ? { scale: 0.98 } : undefined}
                               onClick={isCv ? triggerCvUpload : undefined}
                               style={{
-                                background: isCv ? "rgba(5,150,105,0.06)" : "rgba(255,255,255,0.03)",
+                                background: isCv ? "rgba(5,150,105,0.06)" : "var(--surface-elevated)",
                                 border: isCv ? "1px solid rgba(5,150,105,0.3)" : "1px solid rgba(245,158,11,0.15)",
                                 borderRadius: 10,
                                 padding: "11px 14px",
@@ -569,7 +569,7 @@ export default function ProfileScreen() {
                   style={{
                     display: "flex", justifyContent: "space-between", alignItems: "center",
                     padding: "14px 0",
-                    borderBottom: "1px solid rgba(255,255,255,0.04)",
+                    borderBottom: "1px solid var(--border)",
                   }}
                 >
                   <span style={{ fontSize: 13, color: "var(--text-muted)", fontWeight: 500, display: "flex", alignItems: "center", gap: 8 }}>
@@ -585,7 +585,7 @@ export default function ProfileScreen() {
                   style={{
                     display: "flex", justifyContent: "space-between", alignItems: "center",
                     padding: "14px 0",
-                    borderBottom: "1px solid rgba(255,255,255,0.04)",
+                    borderBottom: "1px solid var(--border)",
                   }}
                 >
                   <span style={{ fontSize: 13, color: "var(--text-muted)", fontWeight: 500, display: "flex", alignItems: "center", gap: 8 }}>
@@ -601,7 +601,7 @@ export default function ProfileScreen() {
                   style={{
                     display: "flex", flexDirection: "column",
                     padding: "14px 0",
-                    borderBottom: "1px solid rgba(255,255,255,0.04)",
+                    borderBottom: "1px solid var(--border)",
                     gap: 8
                   }}
                 >
@@ -615,7 +615,7 @@ export default function ProfileScreen() {
                         <div
                           key={cat}
                           style={{
-                            background: "rgba(255,255,255,0.04)",
+                            background: "var(--surface-elevated)",
                             border: "1px solid rgba(255,255,255,0.06)",
                             borderRadius: 10,
                             padding: "6px 10px",

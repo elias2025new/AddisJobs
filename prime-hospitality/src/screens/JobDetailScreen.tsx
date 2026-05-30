@@ -45,10 +45,10 @@ export default function JobDetailScreen({ job, onBack, onApply }: JobDetailScree
             position: "sticky",
             top: 0,
             zIndex: 10,
-            background: "rgba(10,15,30,0.95)",
+            background: "var(--surface-elevated)",
             backdropFilter: "blur(16px)",
             WebkitBackdropFilter: "blur(16px)",
-            borderBottom: "1px solid rgba(255,255,255,0.05)",
+            borderBottom: "1px solid var(--border)",
             paddingLeft: 20,
             paddingRight: 20,
             paddingBottom: 14,
@@ -65,8 +65,8 @@ export default function JobDetailScreen({ job, onBack, onApply }: JobDetailScree
               width: 38,
               height: 38,
               borderRadius: 12,
-              background: "rgba(255,255,255,0.06)",
-              border: "1px solid rgba(255,255,255,0.08)",
+              background: "var(--surface-elevated)",
+              border: "1px solid var(--border)",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -166,8 +166,8 @@ export default function JobDetailScreen({ job, onBack, onApply }: JobDetailScree
               <div
                 key={label}
                 style={{
-                  background: "rgba(255,255,255,0.03)",
-                  border: "1px solid rgba(255,255,255,0.06)",
+                  background: "var(--surface-elevated)",
+                  border: "1px solid var(--border)",
                   borderRadius: 12,
                   padding: "12px 14px",
                 }}
@@ -238,8 +238,8 @@ export default function JobDetailScreen({ job, onBack, onApply }: JobDetailScree
                 fontSize: 14,
                 color: "var(--text-secondary)",
                 lineHeight: 1.7,
-                background: "rgba(255,255,255,0.02)",
-                border: "1px solid rgba(255,255,255,0.04)",
+                background: "var(--surface-elevated)",
+                border: "1px solid var(--border)",
                 borderRadius: 12,
                 padding: 14,
               }}
@@ -269,8 +269,8 @@ export default function JobDetailScreen({ job, onBack, onApply }: JobDetailScree
             </h3>
             <div
               style={{
-                background: "rgba(255,255,255,0.02)",
-                border: "1px solid rgba(255,255,255,0.04)",
+                background: "var(--surface-elevated)",
+                border: "1px solid var(--border)",
                 borderRadius: 12,
                 overflow: "hidden",
               }}
@@ -290,7 +290,7 @@ export default function JobDetailScreen({ job, onBack, onApply }: JobDetailScree
                     justifyContent: "space-between",
                     alignItems: "flex-start",
                     padding: "12px 14px",
-                    borderBottom: i < arr.length - 1 ? "1px solid rgba(255,255,255,0.04)" : "none",
+                    borderBottom: i < arr.length - 1 ? "1px solid var(--border)" : "none",
                     gap: 12,
                   }}
                 >
@@ -337,10 +337,10 @@ export default function JobDetailScreen({ job, onBack, onApply }: JobDetailScree
             right: 0,
             padding: "12px 20px",
             paddingBottom: "calc(12px + env(safe-area-inset-bottom, 0px))",
-            background: "rgba(10,15,30,0.95)",
+            background: "var(--surface-elevated)",
             backdropFilter: "blur(16px)",
             WebkitBackdropFilter: "blur(16px)",
-            borderTop: "1px solid rgba(255,255,255,0.06)",
+            borderTop: "1px solid var(--border)",
           }}
         >
           <motion.button
