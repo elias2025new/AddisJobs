@@ -3,8 +3,9 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, LazyMotion, domAnimation, AnimatePresence } from "framer-motion";
 import { Phone, MapPin, Briefcase, FileText, RefreshCw, CheckCircle, HelpCircle, ShieldCheck, Settings, AlertCircle, Upload, Loader2, Moon, Sun, X } from "lucide-react";
-import { fetchProfile as fetchProfileApi, updateCv } from "@/lib/api";
+import { fetchProfile as fetchProfileApi } from "@/lib/api";
 import { useTelegram } from "@/hooks/useTelegram";
+import { useCvUpload } from "@/hooks/useCvUpload";
 import { supabase } from "@/lib/supabase";
 
 // ── Profile completion helpers ──────────────────────────────────────────────
@@ -80,6 +81,13 @@ export default function ProfileScreen() {
     try { return localStorage.getItem("profile_privacy_dismissed") === "true"; } catch { return false; }
   });
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [toast, setToast] = useState<{ type: "success" | "error"; message: string } | null>(null);
+
+  const showToast = (type: "success" | "error", message: string) => {
+    setToast({ type, message });
+    setTimeout(() => setToast(null), 3500);
+  };
+
   const [isDark, setIsDark] = useState<boolean>(() => {
     try { return localStorage.getItem("theme") === "dark"; } catch { return false; }
   });
@@ -135,11 +143,26 @@ export default function ProfileScreen() {
 
   useEffect(() => {
     fetchProfile();
+
+    // Listen for background CV upload success so we can refetch
+    const handleCvSuccess = () => fetchProfile();
+    window.addEventListener("cvUploadSuccess", handleCvSuccess);
+
+    // Listen for CV upload toast events from useCvUpload hook
+    const handleCvToast = (e: Event) => {
+      const { type, message } = (e as CustomEvent).detail;
+      showToast(type, message);
+    };
+    window.addEventListener("cvToast", handleCvToast);
+
+    return () => {
+      window.removeEventListener("cvUploadSuccess", handleCvSuccess);
+      window.removeEventListener("cvToast", handleCvToast);
+    };
   }, [fetchProfile]);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [isUploadingCv, setIsUploadingCv] = useState(false);
-  const [cvUploadError, setCvUploadError] = useState<string | null>(null);
+  const { isUploadingCv, cvUploadError, uploadCv } = useCvUpload();
 
   const triggerCvUpload = () => {
     fileInputRef.current?.click();
@@ -147,63 +170,7 @@ export default function ProfileScreen() {
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0];
-      if (file.size > 5 * 1024 * 1024) {
-        alert("File is too large. Max 5MB.");
-        return;
-      }
-      if (!file.name.endsWith(".pdf") && !file.name.endsWith(".doc") && !file.name.endsWith(".docx")) {
-        alert("Please upload a PDF or Word document.");
-        return;
-      }
-
-      setIsUploadingCv(true);
-      setCvUploadError(null);
-
-      try {
-        const telegramId = user?.id || Date.now();
-        const fileExt = file.name.split(".").pop();
-        const fileName = `${telegramId}-${Date.now()}.${fileExt}`;
-        const filePath = `cvs/${fileName}`;
-
-        console.log("[CV Upload] Uploading to resumes storage...");
-        const { error: uploadError } = await supabase.storage
-          .from("resumes")
-          .upload(filePath, file);
-
-        if (uploadError) {
-          throw new Error(uploadError.message);
-        }
-
-        const { data: publicUrlData } = supabase.storage
-          .from("resumes")
-          .getPublicUrl(filePath);
-
-        const cvUrl = publicUrlData.publicUrl;
-        console.log("[CV Upload] Success! Public URL:", cvUrl);
-
-        // Update profile in DB via Edge Function
-        await updateCv({ initData, cvUrl });
-
-        // Refresh profile state
-        await fetchProfile();
-        
-        if (typeof window !== "undefined" && (window as any).Telegram?.WebApp) {
-          (window as any).Telegram.WebApp.showAlert("CV uploaded successfully!");
-        } else {
-          alert("CV uploaded successfully!");
-        }
-      } catch (err: any) {
-        console.error("Error uploading CV:", err);
-        setCvUploadError(err.message || "Failed to upload CV");
-        if (typeof window !== "undefined" && (window as any).Telegram?.WebApp) {
-          (window as any).Telegram.WebApp.showAlert(err.message || "Failed to upload CV");
-        } else {
-          alert(err.message || "Failed to upload CV");
-        }
-      } finally {
-        setIsUploadingCv(false);
-      }
+      await uploadCv(e.target.files[0]);
     }
   };
 
@@ -226,10 +193,10 @@ export default function ProfileScreen() {
                   .eq("telegram_id", profile.telegram_id);
                 if (error) throw error;
                 await fetchProfile();
-                tg.showAlert("Phone number shared successfully!");
+                showToast("success", "Phone number shared successfully!");
               } catch (err: any) {
                 console.error("Error updating phone:", err);
-                tg.showAlert("Failed to save phone number.");
+                showToast("error", "Failed to save phone number.");
               } finally {
                 setIsLoading(false);
               }
@@ -237,7 +204,7 @@ export default function ProfileScreen() {
           }
         });
       } else {
-        alert("This feature is only available inside Telegram.");
+        showToast("error", "This feature is only available inside Telegram.");
       }
     } catch (e) {
       console.warn("Telegram SDK requestContact error:", e);
@@ -264,6 +231,98 @@ export default function ProfileScreen() {
           paddingBottom: 96,
         }}
       >
+        {/* ── Toast Notification ── */}
+        <AnimatePresence>
+          {toast && (
+            <motion.div
+              key="toast"
+              initial={{ opacity: 0, y: -80, scale: 0.92 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -80, scale: 0.92 }}
+              transition={{ type: "spring", stiffness: 380, damping: 30 }}
+              style={{
+                position: "fixed",
+                top: "max(24px, env(safe-area-inset-top, 0px))",
+                left: "50%",
+                transform: "translateX(-50%)",
+                zIndex: 9999,
+                maxWidth: 340,
+                width: "calc(100% - 40px)",
+                background: toast.type === "success"
+                  ? "linear-gradient(135deg, rgba(5,150,105,0.97) 0%, rgba(4,120,87,0.97) 100%)"
+                  : "linear-gradient(135deg, rgba(220,38,38,0.97) 0%, rgba(185,28,28,0.97) 100%)",
+                borderRadius: 18,
+                padding: "14px 18px",
+                display: "flex",
+                alignItems: "center",
+                gap: 14,
+                boxShadow: toast.type === "success"
+                  ? "0 8px 32px rgba(5,150,105,0.45), 0 2px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.15)"
+                  : "0 8px 32px rgba(220,38,38,0.45), 0 2px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.15)",
+                backdropFilter: "blur(12px)",
+              }}
+            >
+              {/* Icon */}
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: "spring", stiffness: 400, damping: 20, delay: 0.08 }}
+                style={{
+                  width: 38,
+                  height: 38,
+                  borderRadius: "50%",
+                  background: "rgba(255,255,255,0.18)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  flexShrink: 0,
+                }}
+              >
+                {toast.type === "success" ? (
+                  <CheckCircle size={20} color="#fff" />
+                ) : (
+                  <AlertCircle size={20} color="#fff" />
+                )}
+              </motion.div>
+              {/* Text */}
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <p style={{
+                  fontSize: 14,
+                  fontWeight: 700,
+                  color: "#fff",
+                  lineHeight: 1.3,
+                  margin: 0,
+                }}>
+                  {toast.type === "success" ? "Success!" : "Something went wrong"}
+                </p>
+                <p style={{
+                  fontSize: 13,
+                  color: "rgba(255,255,255,0.82)",
+                  marginTop: 2,
+                  lineHeight: 1.4,
+                }}>
+                  {toast.message}
+                </p>
+              </div>
+              {/* Progress bar */}
+              <motion.div
+                initial={{ scaleX: 1 }}
+                animate={{ scaleX: 0 }}
+                transition={{ duration: 3.5, ease: "linear" }}
+                style={{
+                  position: "absolute",
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  height: 3,
+                  borderRadius: "0 0 18px 18px",
+                  background: "rgba(255,255,255,0.35)",
+                  transformOrigin: "left",
+                }}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
         {/* Header */}
         <div className="safe-screen-top" style={{ paddingLeft: 20, paddingRight: 20, paddingBottom: 20, flexShrink: 0 }}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>

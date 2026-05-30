@@ -17,6 +17,8 @@ export const viewport: Viewport = {
   themeColor: "#0A0F1E",
 };
 
+import { CvUploadProvider } from "@/hooks/useCvUpload";
+
 export default function RootLayout({
   children,
 }: {
@@ -35,8 +37,11 @@ export default function RootLayout({
         {/* Load Telegram WebApp SDK — must be synchronous so it's available on init */}
         <script src="https://telegram.org/js/telegram-web-app.js"></script>
       </head>
-      <body className="antialiased">{children}</body>
-
+      <body className="antialiased">
+        <CvUploadProvider>
+          {children}
+        </CvUploadProvider>
+      </body>
     </html>
   );
 }
