@@ -19,37 +19,32 @@ function getCompletionSections(profile: Profile): CompletionSection[] {
   return [
     {
       key: "personal",
-      label: "Personal Info",
-      description: "Full name, age & location filled in.",
+      label: "Personal information incomplete",
       done: !!(profile.full_name && profile.age && profile.location),
       weight: 20,
     },
     {
       key: "contact",
-      label: "Phone / Contact",
-      description: "Share your contact so employers can reach you.",
+      label: "Contact number not shared",
       done: !!(profile.contact_shared),
       weight: 20,
     },
     {
       key: "roles",
-      label: "Job Roles Selected",
-      description: "Pick the roles you're looking for.",
+      label: "No job roles selected",
       done: !!(profile.selected_categories && profile.selected_categories.length > 0),
       weight: 20,
     },
     {
       key: "experience",
-      label: "Experience Levels",
-      description: "Set your experience level for each role.",
+      label: "Experience levels not set",
       done: !!(profile.selected_categories && profile.selected_categories.length > 0 &&
         profile.selected_categories.every((c) => !!profile.experience_levels?.[c])),
       weight: 20,
     },
     {
       key: "cv",
-      label: "Resume (CV)",
-      description: "Upload your CV to stand out to employers.",
+      label: "Resume (CV) not uploaded",
       done: !!(profile.cv_url),
       weight: 20,
     },
@@ -332,33 +327,13 @@ export default function ProfileScreen() {
                         />
                       </div>
 
-                      {/* Section dots */}
-                      <div style={{ display: "flex", gap: 6, marginTop: 12, flexWrap: "wrap" }}>
-                        {sections.map((s) => (
-                          <div
-                            key={s.key}
-                            style={{
-                              display: "flex", alignItems: "center", gap: 5,
-                              fontSize: 11, fontWeight: 600,
-                              color: s.done ? "var(--success)" : "rgba(255,255,255,0.35)",
-                            }}
-                          >
-                            <div style={{
-                              width: 7, height: 7, borderRadius: "50%",
-                              background: s.done ? "var(--success)" : "rgba(255,255,255,0.15)",
-                              flexShrink: 0,
-                            }} />
-                            {s.label}
-                          </div>
-                        ))}
-                      </div>
                     </div>
 
                     {/* ── Incomplete section nudge cards ── */}
                     {incomplete.length > 0 && (
                       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                        <p style={{ fontSize: 12, fontWeight: 700, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em" }}>
-                          Complete your profile
+                        <p style={{ fontSize: 12, fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 2 }}>
+                          Pending
                         </p>
                         {incomplete.map((s) => (
                           <motion.div
@@ -366,38 +341,26 @@ export default function ProfileScreen() {
                             initial={{ opacity: 0, x: -8 }}
                             animate={{ opacity: 1, x: 0 }}
                             style={{
-                              background: "rgba(245,158,11,0.06)",
-                              border: "1px solid rgba(245,158,11,0.18)",
-                              borderRadius: 12,
-                              padding: "12px 14px",
+                              background: "rgba(255,255,255,0.03)",
+                              border: "1px solid rgba(245,158,11,0.15)",
+                              borderRadius: 10,
+                              padding: "11px 14px",
                               display: "flex",
                               alignItems: "center",
-                              gap: 12,
+                              gap: 10,
                             }}
                           >
                             <div style={{
-                              width: 32, height: 32, borderRadius: 10,
-                              background: "rgba(245,158,11,0.12)",
-                              display: "flex", alignItems: "center", justifyContent: "center",
+                              width: 6, height: 6, borderRadius: "50%",
+                              background: "#F59E0B",
                               flexShrink: 0,
-                            }}>
-                              <AlertCircle size={16} color="#F59E0B" />
-                            </div>
-                            <div style={{ flex: 1 }}>
-                              <p style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary)", marginBottom: 2 }}>
-                                {s.label}
-                              </p>
-                              <p style={{ fontSize: 12, color: "var(--text-muted)" }}>
-                                {s.description}
-                              </p>
-                            </div>
+                            }} />
+                            <p style={{ fontSize: 13, fontWeight: 500, color: "var(--text-secondary)", flex: 1 }}>
+                              {s.label}
+                            </p>
                             <span style={{
                               fontSize: 11, fontWeight: 700,
                               color: "#F59E0B",
-                              background: "rgba(245,158,11,0.12)",
-                              border: "1px solid rgba(245,158,11,0.25)",
-                              borderRadius: 100,
-                              padding: "3px 8px",
                               flexShrink: 0,
                             }}>
                               +{s.weight}%
