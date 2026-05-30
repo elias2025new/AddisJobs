@@ -137,8 +137,8 @@ const JOB_CATEGORIES_DATA = [
 ];
 
 function Step1_JobField({ state, updateState, onNext }: StepProps) {
-  const [shakeId, setShakeId] = useState<string | null>(null);
-  const [otherValue, setOtherValue] = useState("");
+  const [shakeId, setShakeId] = React.useState<string | null>(null);
+  const [otherValue, setOtherValue] = React.useState("");
 
   const toggleCategory = (label: string) => {
     const isSelected = state.selectedCategories.includes(label);
@@ -155,7 +155,7 @@ function Step1_JobField({ state, updateState, onNext }: StepProps) {
   };
 
   return (
-    <div style={{ padding: "130px 20px 40px", flex: 1, display: "flex", flexDirection: "column" }}>
+    <div style={{ padding: "80px 20px 40px", flex: 1, display: "flex", flexDirection: "column" }}>
       <h1 style={{ fontSize: 28, fontWeight: 800, color: "var(--text-primary)", marginBottom: 8, lineHeight: 1.2 }}>
         What type of work are you looking for?
       </h1>
@@ -174,22 +174,16 @@ function Step1_JobField({ state, updateState, onNext }: StepProps) {
               transition={isShaking ? { duration: 0.3 } : {}}
               onClick={() => toggleCategory(cat.label)}
               style={{
-                background: "none",
-                border: "none",
-                padding: "6px 0",
-                display: "inline-flex",
-                alignItems: "center",
-                cursor: "pointer",
-                fontFamily: "inherit",
+                background: "none", border: "none", padding: "6px 0",
+                display: "inline-flex", alignItems: "center",
+                cursor: "pointer", fontFamily: "inherit",
               }}
             >
               <span style={{
-                fontSize: 16,
-                fontWeight: isSelected ? 700 : 500,
+                fontSize: 16, fontWeight: isSelected ? 700 : 500,
                 color: isSelected ? "var(--brand)" : "var(--text-secondary)",
                 transition: "color 0.2s, font-weight 0.2s",
-                display: "inline-flex",
-                alignItems: "center",
+                display: "inline-flex", alignItems: "center",
               }}>
                 {cat.label}
                 {isSelected && (
@@ -222,7 +216,132 @@ function Step1_JobField({ state, updateState, onNext }: StepProps) {
       )}
 
       {state.selectedCategories.includes("Other") && (
-        <motion.div
+        <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} style={{ marginTop: 16 }}>
+          <p style={{ fontSize: 13, fontWeight: 600, color: "var(--text-muted)", marginBottom: 8, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+            Please Specify
+          </p>
+          <input
+            className="input-base"
+            placeholder="e.g. Musician"
+            value={otherValue}
+            onChange={(e) => setOtherValue(e.target.value)}
+          />
+        </motion.div>
+      )}
+
+      {state.selectedCategories.length > 0 && (
+        <motion.button
+          initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+          className="btn-primary"
+          style={{ marginTop: 24 }}
+          onClick={() => {
+            if (state.selectedCategories.includes("Other") && otherValue.trim()) {
+              const updated = state.selectedCategories.map(c => c === "Other" ? otherValue.trim() : c);
+              updateState({ selectedCategories: updated });
+            }
+            onNext();
+          }}
+        >
+          Continue
+        </motion.button>
+      )}
+    </div>
+  );
+}
+
+// --- Step 2: Share Contact ---
+function Step2_Contact({ state, updateState, onNext }: StepProps) {
+  const { isReady } = useTelegram();
+
+  const handleYes = () => {
+    try {
+      const tg = (window as any).Telegram?.WebApp;
+      if (tg && tg.requestContact) {
+        tg.requestContact((shared: boolean, data: any) => {
+          if (shared) {
+            let phone = data?.contact?.phone_number || data?.phone_number || "";
+            if (phone && !phone.startsWith("+")) {
+              phone = "+" + phone;
+            }
+            updateState({ contactShared: true, phoneNumber: phone });
+            onNext();
+          } else {
+            // User dismissed the native prompt — just stay on the page
+            return;
+          }
+        });
+        return;
+      }
+    } catch (e) {
+      console.warn("Telegram SDK requestContact error:", e);
+    }
+
+    // Fallback for browser/dev environment
+    updateState({ contactShared: true, phoneNumber: "" });
+    onNext();
+  };
+
+  const handleNo = () => {
+    updateState({ contactShared: false, phoneNumber: "" });
+    onNext();
+  };
+
+  return (
+    <div style={{ padding: "130px 20px 40px", flex: 1, display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>
+      <div style={{ width: 80, height: 80, borderRadius: "50%", background: "rgba(5,150,105,0.1)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 24 }}>
+        <Smartphone size={36} color="var(--brand)" />
+      </div>
+      <h1 style={{ fontSize: 26, fontWeight: 800, color: "var(--text-primary)", marginBottom: 12, lineHeight: 1.2 }}>
+        Can we share your contact with employers?
+      </h1>
+      <p style={{ fontSize: 15, color: "var(--text-secondary)", marginBottom: 40, maxWidth: 300 }}>
+        This helps employers reach you faster when they want to hire you.
+      </p>
+
+      <div style={{ display: "flex", flexDirection: "column", gap: 16, width: "100%" }}>
+        <motion.button
+          whileTap={{ scale: 0.96 }}
+          onClick={handleYes}
+          style={{
+            padding: 20, borderRadius: 16, background: "var(--card)", border: "1px solid var(--brand)",
+            display: "flex", alignItems: "center", gap: 16, cursor: "pointer", textAlign: "left"
+          }}
+        >
+          <div style={{ width: 40, height: 40, borderRadius: "50%", background: "var(--brand)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <CheckCircle size={20} color="#FFFFFF" />
+          </div>
+          <div>
+            <p style={{ fontSize: 16, fontWeight: 700, color: "var(--text-primary)", marginBottom: 4 }}>Yes, share my contact</p>
+            <p style={{ fontSize: 13, color: "var(--text-secondary)" }}>Employers can reach you directly</p>
+          </div>
+        </motion.button>
+
+        <motion.button
+          whileTap={{ scale: 0.96 }}
+          onClick={handleNo}
+          style={{
+            padding: 20, borderRadius: 16, background: "var(--card)", border: "1px solid var(--border)",
+            display: "flex", alignItems: "center", gap: 16, cursor: "pointer", textAlign: "left"
+          }}
+        >
+          <div style={{ width: 40, height: 40, borderRadius: "50%", background: "var(--surface-elevated)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <Lock size={20} color="var(--text-muted)" />
+          </div>
+          <div>
+            <p style={{ fontSize: 16, fontWeight: 700, color: "var(--text-primary)", marginBottom: 4 }}>No, keep it private</p>
+            <p style={{ fontSize: 13, color: "var(--text-secondary)" }}>You will be contacted through the app only</p>
+          </div>
+        </motion.button>
+      </div>
+    </div>
+  );
+}
+
+// --- Step 3: Experience Level ---
+const EXPERIENCE_OPTIONS = ["No Experience", "Less than 1 year", "1 to 2 years", "3 to 5 years", "5+ years"];
+
+function Step3_Experience({ state, updateState, onNext }: StepProps) {
+  const handleSelect = (category: string, level: string) => {
     updateState({
       experienceLevels: { ...state.experienceLevels, [category]: level }
     });
@@ -278,8 +397,8 @@ function Step1_JobField({ state, updateState, onNext }: StepProps) {
 
 // --- Step 4: Personal Details ---
 const ADDIS_NEIGHBORHOODS = [
-  "Bole", "Kazanchis", "CMC", "Megenagna", "Sarbet", "Lebu", "Gerji", "Piassa", 
-  "Akaki", "Lideta", "Kirkos", "Kolfe", "Yeka", "Ayat", "Kality", "Gulele", 
+  "Bole", "Kazanchis", "CMC", "Megenagna", "Sarbet", "Lebu", "Gerji", "Piassa",
+  "Akaki", "Lideta", "Kirkos", "Kolfe", "Yeka", "Ayat", "Kality", "Gulele",
   "Addis Ketema", "Nifas Silk", "Jemo", "Kera", "Merkato", "Shiromeda", "Other"
 ];
 
@@ -346,7 +465,6 @@ function Step4_Personal({ state, updateState, onNext }: StepProps) {
                     border: isSelected ? "1.5px solid var(--brand)" : "1px solid var(--border)",
                   }}
                 >
-                  {/* SVG figure */}
                   {g === "male" ? (
                     <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
                       <circle cx="20" cy="11" r="7" fill={isSelected ? "#059669" : "#8B9BBE"} />
@@ -490,7 +608,7 @@ function Step6_Success({ state, onNext }: { state: ReturnType<typeof useOnboardi
         initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring", stiffness: 200, damping: 20 }}
         style={{ width: 100, height: 100, borderRadius: "50%", background: "linear-gradient(135deg, var(--brand) 0%, var(--brand-dim) 100%)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 32 }}
       >
-        <CheckCircle size={50} color="var(--navy)" />
+        <CheckCircle size={50} color="#FFFFFF" />
       </motion.div>
       
       <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} style={{ fontSize: 32, fontWeight: 800, color: "var(--text-primary)", marginBottom: 12, lineHeight: 1.2 }}>
