@@ -115,8 +115,6 @@ export default function App() {
           justifyContent: "center",
           height: "100dvh",
           background: "transparent",
-          flexDirection: "column",
-          gap: 16,
         }}
       >
         <motion.div
@@ -132,9 +130,6 @@ export default function App() {
         >
           <img src="/logo.png" alt="Prime Hospitality Logo" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
         </motion.div>
-        <p style={{ fontSize: 14, color: "var(--text-muted)", fontWeight: 500 }}>
-          Loading Prime Hospitality…
-        </p>
       </div>
     );
   }
