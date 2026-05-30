@@ -207,6 +207,43 @@ export default function ProfileScreen() {
     }
   };
 
+  const handleShareContact = async () => {
+    try {
+      const tg = (window as any).Telegram?.WebApp;
+      if (tg && tg.requestContact) {
+        tg.requestContact(async (shared: boolean, data: any) => {
+          if (shared) {
+            let phone = data?.contact?.phone_number || data?.phone_number || "";
+            if (phone && !phone.startsWith("+")) {
+              phone = "+" + phone;
+            }
+            if (profile?.telegram_id) {
+              setIsLoading(true);
+              try {
+                const { error } = await supabase
+                  .from("profiles")
+                  .update({ contact_shared: true, phone_number: phone })
+                  .eq("telegram_id", profile.telegram_id);
+                if (error) throw error;
+                await fetchProfile();
+                tg.showAlert("Phone number shared successfully!");
+              } catch (err: any) {
+                console.error("Error updating phone:", err);
+                tg.showAlert("Failed to save phone number.");
+              } finally {
+                setIsLoading(false);
+              }
+            }
+          }
+        });
+      } else {
+        alert("This feature is only available inside Telegram.");
+      }
+    } catch (e) {
+      console.warn("Telegram SDK requestContact error:", e);
+    }
+  };
+
   const getInitials = (name: string) => {
     if (!name) return "U";
     const parts = name.trim().split(/\s+/);
@@ -578,17 +615,34 @@ export default function ProfileScreen() {
               >
                 {/* Phone */}
                 <div
+                  onClick={() => {
+                    if (!profile.phone_number) {
+                      handleShareContact();
+                    }
+                  }}
                   style={{
                     display: "flex", justifyContent: "space-between", alignItems: "center",
                     padding: "14px 0",
                     borderBottom: "1px solid var(--border)",
+                    cursor: !profile.phone_number ? "pointer" : "default",
                   }}
                 >
                   <span style={{ fontSize: 13, color: "var(--text-muted)", fontWeight: 500, display: "flex", alignItems: "center", gap: 8 }}>
                     <Phone size={14} color="var(--brand)" /> Phone
                   </span>
-                  <span style={{ fontSize: 13, color: "var(--text-primary)", fontWeight: 600 }}>
-                    {profile.phone_number ? profile.phone_number : (profile.contact_shared ? "Shared via Telegram" : "Not Shared")}
+                  <span style={{ 
+                    fontSize: 13, 
+                    color: profile.phone_number ? "var(--text-primary)" : "var(--brand)", 
+                    fontWeight: 600,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 6
+                  }}>
+                    {profile.phone_number ? profile.phone_number : (
+                      <>
+                        <RefreshCw size={12} /> Share Now
+                      </>
+                    )}
                   </span>
                 </div>
 
