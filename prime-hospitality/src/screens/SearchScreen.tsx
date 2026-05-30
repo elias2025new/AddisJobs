@@ -117,7 +117,7 @@ export default function SearchScreen({ onJobSelect }: SearchScreenProps) {
             paddingLeft: 20,
             paddingRight: 20,
             paddingBottom: 12,
-            background: "linear-gradient(180deg, rgba(10,15,30,1) 0%, rgba(10,15,30,0.95) 100%)",
+            background: "var(--app-bg)",
             flexShrink: 0,
           }}
         >
@@ -136,8 +136,8 @@ export default function SearchScreen({ onJobSelect }: SearchScreenProps) {
               display: "flex",
               alignItems: "center",
               gap: 10,
-              background: "rgba(255,255,255,0.06)",
-              border: "1px solid rgba(255,255,255,0.12)",
+              background: "var(--surface-elevated)",
+              border: "1px solid var(--border)",
               borderRadius: 14,
               padding: "12px 16px",
               marginBottom: 10,
@@ -170,7 +170,7 @@ export default function SearchScreen({ onJobSelect }: SearchScreenProps) {
                 onClick={clearSearch}
                 style={{
                   width: 22, height: 22, borderRadius: "50%",
-                  background: "rgba(255,255,255,0.12)",
+                  background: "var(--surface-elevated)",
                   border: "none", cursor: "pointer",
                   display: "flex", alignItems: "center", justifyContent: "center",
                   flexShrink: 0,
@@ -184,8 +184,8 @@ export default function SearchScreen({ onJobSelect }: SearchScreenProps) {
               onClick={() => setShowFilters((v) => !v)}
               style={{
                 width: 32, height: 32, borderRadius: 9,
-                background: showFilters ? "rgba(5,150,105,0.15)" : "rgba(255,255,255,0.05)",
-                border: showFilters ? "1px solid rgba(5,150,105,0.3)" : "1px solid rgba(255,255,255,0.07)",
+                background: showFilters ? "var(--brand-subtle)" : "var(--surface-elevated)",
+                border: showFilters ? "1px solid var(--border-active)" : "1px solid var(--border)",
                 cursor: "pointer",
                 display: "flex", alignItems: "center", justifyContent: "center",
                 flexShrink: 0,
@@ -224,8 +224,8 @@ export default function SearchScreen({ onJobSelect }: SearchScreenProps) {
                             borderRadius: 100,
                             fontSize: 13, fontWeight: 600,
                             cursor: "pointer",
-                            background: active ? "rgba(5,150,105,0.15)" : "rgba(255,255,255,0.04)",
-                            border: active ? "1px solid rgba(5,150,105,0.35)" : "1px solid rgba(255,255,255,0.07)",
+                            background: active ? "var(--brand-subtle)" : "var(--surface-elevated)",
+                            border: active ? "1px solid var(--border-active)" : "1px solid var(--border)",
                             color: active ? "var(--brand)" : "var(--text-secondary)",
                             transition: "all 0.15s ease",
                           }}
@@ -319,8 +319,8 @@ export default function SearchScreen({ onJobSelect }: SearchScreenProps) {
               <div
                 style={{
                   width: 72, height: 72, borderRadius: 20,
-                  background: "rgba(255,255,255,0.04)",
-                  border: "1px solid rgba(255,255,255,0.07)",
+                  background: "var(--surface-elevated)",
+                  border: "1px solid var(--border)",
                   display: "flex", alignItems: "center", justifyContent: "center",
                   margin: "0 auto 20px", fontSize: 32,
                 }}
@@ -368,8 +368,8 @@ export default function SearchScreen({ onJobSelect }: SearchScreenProps) {
                       <div
                         style={{
                           width: 46, height: 46, borderRadius: 13,
-                          background: "rgba(5,150,105,0.08)",
-                          border: "1px solid rgba(5,150,105,0.15)",
+                          background: "var(--brand-subtle)",
+                          border: "1px solid var(--border)",
                           display: "flex", alignItems: "center", justifyContent: "center",
                           fontSize: 22, flexShrink: 0,
                         }}
